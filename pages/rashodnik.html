@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расходники | STALCUBE Вики</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../image/site.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Дополнительные стили для анимации */
+        .no-data {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #FFE100;
+            text-shadow: 0 0 10px rgba(255, 225, 0, 0.5);
+            animation: pulse 2s infinite;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+
+            100% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+        }
+
+        .no-data i {
+            display: block;
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            position: relative;
+            min-height: 60vh;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="navbar">
+            <a href="../index.html" class="logo">
+                <span>STALCUBE.WIKI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Главная</a></li>
+                <li><a href="https://stalcube.su/">Сайт игры</a></li>
+                <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
+                <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
+                <ul class="nav-links">
+                <li><a href="#">Главная</a></li>
+                <li><a href="https://stalcube.su/">Сайт игры</a></li>
+                <li>
+                    <a href="#" class="dropdown-toggle">Разделы </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="./index1.html">Артефакты</a></li>
+                        <li><a href="./index2.html">Броня и костюмы</a></li>
+                        <li><a href="./index3.html">Оружие</a></li>
+                        <li><a href="./faq.html">FAQ</a></li>
+                        <li><a href="./obvesy.html">Обвесы</a></li>
+                        <li><a href="./mutants.html">Мутанты</a></li>
+                        <li><a href="./news.html">Статьи и гайды</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+    <a href="#" class="dropdown-toggle">Инструменты</a>
+    <ul class="dropdown-menu">
+        
+        <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
+        <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
+         <li><a href="srav.html">Сравнение предметов</a></li>
+    </ul>
+</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Основное содержимое -->
+    <main class="main-content">
+        <div class="no-data">
+            <i class="fas fa-exclamation-triangle"></i>
+            НЕТ ДАННЫХ...
+        </div>
+    </main>
+
+    <!-- Подвал страницы -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>STALCUBE.WIKI</span>
+                <p>Руководство по игре STALCUBE</p>
+            </div>
+
+            <div class="footer-links-container">
+                <div class="footer-links-group">
+                    <h4>Навигация</h4>
+                    <a href="../index.html">Главная</a>
+                    <a href="./news.html">Статьи</a>
+                    <a href="./srav.html">Сравнение предметов</a>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4>Ресурсы</h4>
+                    <a href="https://stalcube.su/">Официальный сайт</a>
+                    <a href="https://cubecalc.ru/">Калькулятор сборок</a>
+                    <a href="https://cubemaps.ru/">Интерактивная карта</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="social-links">
+                <a href="https://vk.com/stalcube.official"><i class="fab fa-vk"></i></a>
+                <a href="https://discord.gg/stalcube"><i class="fab fa-discord"></i></a>
+                <a href="https://www.youtube.com/@stalcube_game"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

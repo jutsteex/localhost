@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сравнение предметов | STALCUBE.WIKI</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/srav.css">
+  <link rel="icon" href="../image/site.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: rgba(47, 43, 40, 0.7);
+      color: #FFF19B;
+      font-family: 'Manrope', sans-serif;
+      font-size: 1rem;
+      padding: 10px 15px;
+      border: 1px solid rgba(255, 241, 155, 0.3);
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      width: 150px;
+    }
+
+    select:hover,
+    select:focus {
+      border-color: #FFF19B;
+      background-color: rgba(47, 43, 40, 0.85);
+    }
+
+    select {
+      background-image: url("data:image/svg+xml;utf8,<svg fill='%23FFF19B' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px 16px;
+      padding-right: 40px;
+    }
+
+
+
+    /* Стили для графиков */
+    .chart-container {
+      width: 100%;
+      height: 250px;
+      margin: 0 auto;
+      background: rgba(47, 43, 40, 0.7);
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .chart-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 10px 0;
+    }
+
+    /* Стили для новых детальных графиков */
+    .detailed-charts-container {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .chart-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(47, 43, 40, 0.7);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 241, 155, 0.3);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .control-group label {
+      color: #FFF19B;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .control-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .control-btn {
+      padding: 8px 16px;
+      border: 1px solid rgba(255, 241, 155, 0.3);
+      border-radius: 4px;
+      background: rgba(47, 43, 40, 0.8);
+      color: #FFF19B;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 241, 155, 0.1);
+      border-color: #FFF19B;
+    }
+
+    .control-btn.active {
+      background: #FFF19B;
+      color: #2F2B28;
+      border-color: #FFF19B;
+    }
+
+    .control-btn[data-hit-type="headshot"].active {
+      background: #FF6B35;
+      color: white;
+      border-color: #FF6B35;
+    }
+
+    .control-btn[data-hit-type="bodyshot"].active {
+      background: #FF6B35;
+      color: white;
+      border-color: #FF6B35;
+    }
+
+    .control-btn[data-hit-type="limbshot"].active {
+      background: #FF6B35;
+      color: white;
+      border-color: #FF6B35;
+    }
+
+    .control-btn[data-metric="btk"].active {
+      background: #8B5CF6;
+      color: white;
+      border-color: #8B5CF6;
+    }
+
+    .control-btn[data-metric="ttk"].active {
+      background: #8B5CF6;
+      color: white;
+      border-color: #8B5CF6;
+    }
+
+    .control-btn[data-metric="dps"].active {
+      background: #10B981;
+      color: white;
+      border-color: #10B981;
+    }
+
+    .main-chart-container {
+      width: 100%;
+      height: 400px;
+      background: rgba(47, 43, 40, 0.7);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 241, 155, 0.3);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 15px;
+      background: rgba(47, 43, 40, 0.7);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 241, 155, 0.3);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Стили для скролла */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(47, 43, 40, 0.5);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #FFF19B;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #e6d98a;
+    }
+
+    /* Адаптивные стили */
+    @media (max-width: 768px) {
+      .chart-container {
+        height: 200px;
+      }
+      
+      .damage-drop-container {
+        max-height: 250px;
+        font-size: 0.9rem;
+      }
+      
+      .damage-drop-table th, 
+      .damage-drop-table td {
+        padding: 8px 4px;
+      }
+      
+      .damage-drop-table {
+        table-layout: auto;
+      }
+
+      .chart-controls {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+      }
+
+      .control-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .main-chart-container {
+        height: 300px;
+        padding: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .damage-drop-container {
+        font-size: 0.8rem;
+      }
+    
+      .damage-drop-table th, 
+      .damage-drop-table td {
+        padding: 6px 3px;
+      }
+    
+      .damage-drop-table h4 {
+        font-size: 0.9rem;
+      }
+      
+      .chart-buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .chart-container {
+        height: 180px;
+        padding: 10px;
+      }
+
+      .control-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+      }
+
+      .main-chart-container {
+        height: 250px;
+        padding: 10px;
+      }
+
+      .chart-legend {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="navbar">
+      <a href="../index.html" class="logo">
+        <span>STALCUBE.WIKI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Главная</a></li>
+        <li><a href="https://stalcube.su/">Сайт игры</a></li>
+        <li>
+          <a href="#" class="dropdown-toggle">Разделы </a>
+          <ul class="dropdown-menu">
+            <li><a href="./index1.html">Артефакты</a></li>
+            <li><a href="./index2.html">Броня и костюмы</a></li>
+            <li><a href="./index3.html">Оружие</a></li>
+            <li><a href="./faq.html">FAQ</a></li>
+            <li><a href="./obvesy.html">Обвесы</a></li>
+            <li><a href="./mutants.html">Мутанты</a></li>
+            <li><a href="./news.html">Статьи и гайды</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle">Инструменты</a>
+          <ul class="dropdown-menu">
+            <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
+            <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
+             <li><a href="srav.html">Сравнение предметов</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="section-header">
+      <h2>Сравнение предметов</h2>
+      <p>Выберите два предмета одного типа для сравнения характеристик</p>
+    </div>
+
+    <div class="comparison-container">
+      <div class="item-type-switch" style="margin-bottom: 20px; text-align:center;">
+        <label for="item-type-select" style="color:#fff; font-size:1.1rem;">Тип предметов:</label>
+        <select id="item-type-select">
+          <option value="artifacts">Артефакты</option>
+          <option value="armor">Броня</option>
+          <option value="weapon">Оружие</option>
+        </select>
+      </div>
+
+      <div class="artifact-selector">
+        <div class="selector-box" id="selector1">
+          <div class="selector-placeholder">Выберите первый предмет</div>
+          <div class="artifact-preview hidden"></div>
+          <button class="select-btn" data-target="selector1">Выбрать</button>
+        </div>
+        <div class="vs-separator">VS</div>
+        <div class="selector-box" id="selector2">
+          <div class="selector-placeholder">Выберите второй предмет</div>
+          <div class="artifact-preview hidden"></div>
+          <button class="select-btn" data-target="selector2">Выбрать</button>
+        </div>
+      </div>
+
+      <button id="compare-btn" class="btn primary" disabled>Сравнить</button>
+    </div>
+
+    <div id="comparison-result" class="hidden">
+      <h3 class="result-title">Результаты сравнения</h3>
+      <div class="result-container"></div>
+    </div>
+  </main>
+
+  <!-- Модальное окно выбора предметов -->
+  <div id="artifact-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Выберите предмет</h3>
+      </div>
+      <div class="modal-body">
+        <div class="search-box" style="margin-bottom: 10px;">
+          <input type="text" id="artifact-search" placeholder="Поиск..." style="width: 100%; padding: 8px;">
+        </div>
+        
+        <div class="artifact-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary cancel-btn">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно расширенного сравнения -->
+  <div id="advanced-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 1000px;">
+      <div class="modal-header">
+        <h3>Расширенное сравнение</h3>
+      </div>
+
+      <div class="metrics-tabs">
+        <button id="info-tab" class="tab-btn active">Информация</button>
+        <button id="metrics-tab" class="tab-btn">Графики</button>
+      </div>
+      
+      <div id="info-view" class="result-view">
+        <div class="info-scroll-container">
+          <div class="advanced-comparison-container">
+            <div class="weapon-stats">
+              <div class="weapon-header">
+                <img id="weapon1-img" src="" alt="" style="width:100px;height:100px;">
+                <h3 id="weapon1-name"></h3>
+              </div>
+              <div id="weapon1-stats" class="stats-list"></div>
+            </div>
+            <div class="weapon-stats">
+              <div class="weapon-header">
+                <img id="weapon2-img" src="" alt="" style="width:100px;height:100px;">
+                <h3 id="weapon2-name"></h3>
+              </div>
+              <div id="weapon2-stats" class="stats-list"></div>
+            </div>
+          </div>
+          <div class="custom-inputs">
+            <h4>Параметры для расчётов</h4>
+            <div class="input-group">
+              <label>Пулестойкость цели:</label>
+              <input type="number" id="bullet-resist" value="250" min="0" max="1000">
+            </div>
+            <div class="input-group">
+              <label>ХП цели:</label>
+              <input type="number" id="target-hp" value="132" min="1" max="1000" step="1">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="calculate-btn" class="btn primary">Пересчитать</button>
+        </div>
+      </div>
+      
+      <div id="metrics-view" class="result-view hidden">
+        <!-- Новые детальные графики -->
+        <div class="detailed-charts-container">
+          <!-- Контролы для графиков -->
+          <div class="chart-controls">
+            <div class="control-group">
+              <label>Тип попадания:</label>
+              <div class="control-buttons">
+                <button class="control-btn active" data-hit-type="headshot">Попадание в голову</button>
+                <button class="control-btn" data-hit-type="bodyshot">Попадание в тело</button>
+                <button class="control-btn" data-hit-type="limbshot">Попадание в конечности</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <label>Метрика:</label>
+              <div class="control-buttons">
+                <button class="control-btn active" data-metric="ttk">TTK (время до убийства)</button>
+                <button class="control-btn" data-metric="dps">DPS (урон в секунду)</button>
+              </div>
+            </div>
+
+          </div>
+          
+          <!-- Основной график -->
+          <div class="main-chart-container">
+            <canvas id="detailed-chart"></canvas>
+          </div>
+          
+          <!-- Легенда -->
+          <div class="chart-legend" id="chart-legend"></div>
+        </div>
+        
+        <!-- Старые графики (скрыты по умолчанию) -->
+        <div class="legacy-charts" style="display: none;">
+          <div class="chart-container">
+            <canvas id="dps-chart"></canvas>
+            <canvas id="ttk-chart" style="display: none;"></canvas>
+          </div>
+          
+          <div class="chart-buttons">
+            <button class="btn secondary" onclick="showDPSChart()">Показать DPS</button>
+            <button class="btn secondary" onclick="showTTKChart()">Показать TTK</button>
+          </div>
+        </div>
+        
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Подвал страницы -->
+  <footer class="footer">
+      <div class="footer-content">
+          <div class="footer-logo">
+              <span>STALCUBE.WIKI</span>
+              <p>Руководство по игре STALCUBE</p>
+          </div>
+
+          <div class="footer-links-container">
+              <div class="footer-links-group">
+                  <h4>Навигация</h4>
+                  <a href="../index.html">Главная</a>
+                  <a href="./news.html">Статьи</a>
+                  <a href="./srav.html">Сравнение предметов</a>
+              </div>
+
+              <div class="footer-links-group">
+                  <h4>Ресурсы</h4>
+                  <a href="https://stalcube.su/">Официальный сайт</a>
+                  <a href="https://cubecalc.ru/">Калькулятор сборок</a>
+                  <a href="https://cubemaps.ru/">Интерактивная карта</a>
+              </div>
+          </div>
+      </div>
+
+      <div class="footer-bottom">
+          <div class="social-links">
+              <a href="https://vk.com/stalcube.official"><i class="fab fa-vk"></i></a>
+              <a href="https://discord.gg/stalcube"><i class="fab fa-discord"></i></a>
+              <a href="https://www.youtube.com/@stalcube_game"><i class="fab fa-youtube"></i></a>
+          </div>
+      </div>
+  </footer>
+
+  <script src="../js/srav.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</body>
+
+</html>

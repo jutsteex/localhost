@@ -1,0 +1,787 @@
+@font-face {
+    font-family: 'Manrope';
+    src: url('../fonts/Manrope.ttf');
+    font-weight: 400 700;
+    font-style: regular;
+}
+
+@font-face {
+    font-family: 'Oswald';
+    src: url('../fonts/Oswald.ttf');
+    font-weight: 400 700;
+    font-style: Medium;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Manrope', sans-serif;
+    background-color: #2F2B28;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+}
+
+/* Навигация */
+nav {
+    background-image: url("../image/navbar.PNG");
+    padding: 0 5%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo {
+    color: #000000;
+    font-size: 24px;
+    font-weight: 700;
+    padding: 20px 0;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-family: 'Manrope', "Arial", sans-serif;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.nav-links li {
+    position: relative;
+    padding: 10px 0;
+}
+
+.nav-links>li>a {
+    color: #000000;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    display: block;
+}
+
+.nav-links li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #000000;
+}
+
+/* Выпадающее меню */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #fff;
+    width: 200px;
+    list-style: none;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    z-index: 100;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.dropdown-menu li {
+    width: 100%;
+    padding: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu li a {
+    display: block;
+    color: #2c3e50;
+    padding: 12px 15px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu li a:hover {
+    background: #FFF19B;
+    color: #000000;
+    padding-left: 20px;
+}
+
+.nav-links li:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-toggle::after {
+    content: "▼";
+    font-size: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* Основной контейнер */
+.weapon-container,
+.artifacts-container,
+.armor-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+    flex: 1;
+    width: 100%;
+}
+
+.weapon-title,
+.artifacts-title,
+.armor-title {
+    color: #ffffff;
+    font-size: 32px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Вкладки категорий */
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.category-tab {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 14px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.category-tab.active {
+    background: #FFF19B;
+    color: #000;
+    font-weight: 600;
+}
+
+.category-tab:hover {
+    background: #FFF19B;
+    color: #000;
+}
+
+/* Сетка артефактов и брони */
+.weapon-grid-container,
+.artifacts-grid-container,
+.armor-grid-container {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.weapon-grid,
+.artifacts-grid,
+.armor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border-radius: 8px;
+    min-width: min-content;
+}
+
+/* Карточки оружия - обновленный стиль */
+.weapon-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    min-width: 0;
+    border: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.weapon-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(255, 225, 0, 0.2);
+}
+
+.weapon-image {
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    border: none;
+    background: rgba(20, 20, 20, 0.3);
+    padding: 5px;
+}
+
+.weapon-name {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: white;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.weapon-type {
+    font-size: 12px;
+    color: #ffffff;
+    margin-top: 5px;
+    font-weight: 400;
+}
+
+/* Карточки артефактов и брони */
+.artifact-card,
+.armor-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    min-width: 0;
+    border: none;
+    position: relative;
+}
+
+.artifact-card:hover,
+.armor-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(255, 225, 0, 0.2);
+}
+
+.artifact-image,
+.armor-image {
+    width: 100%;
+    max-width: 100px;
+    height: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    border: none;
+}
+
+.artifact-name,
+.armor-name {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: white;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.armor-type {
+    font-size: 12px;
+    color: #ffffff;
+    margin-top: 5px;
+    font-weight: 400;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    overflow: auto;
+    touch-action: manipulation;
+    animation: modalFadeIn 0.3s ease-out forwards;
+    opacity: 0;
+}
+
+.modal-content {
+    background: linear-gradient(145deg, #1e1e1e 0%, #1a1a1a 100%);
+    margin: 5% auto;
+    padding: 1px 30px 30px 30px;
+    border-radius: 5px;
+    max-width: 90%;
+    width: 850px;
+    position: relative;
+    border: 1px solid rgba(255, 225, 0, 0.15);
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6);
+    animation: modalSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    transform: translateY(30px);
+    opacity: 0;
+}
+
+.modal-header {
+    margin-bottom: 10px;
+}
+
+.modal-title {
+    color: #ffffff;
+    margin: 15px;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding-top: -5px;
+    text-align: center;
+    width: 100%;
+}
+
+.modal-title::before {
+    content: "";
+    margin: 0;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #FFF19B;
+    border-radius: 2px;
+    transform: rotate(45deg);
+}
+
+.modal-content-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.modal-left {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#modalWeaponImage,
+#modalArtifactImage,
+#modalArmorImage {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    border-radius: 2px;
+    background: rgba(20, 20, 20, 0.5);
+    padding: 10px;
+    border: 1px solid rgba(255, 225, 0, 0.1);
+    margin: 0 0 15px 0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.modal-description {
+    color: #ffffff;
+    line-height: 1.6;
+    font-size: 15px;
+    margin: 0;
+    font-weight: 400;
+    padding-left: 0;
+    align-self: flex-start;
+}
+
+.modal-right {
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+    border-left: 1px solid rgba(255, 225, 0, 0.1);
+}
+
+.property-title {
+    color: #ffe3e3;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 17px;
+    text-align: left;
+    padding-left: 0;
+}
+
+.weapon-properties,
+.artifact-properties,
+.armor-properties {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.property-group {
+    background: rgba(30, 30, 30, 0.7);
+    border-radius: 6px;
+    padding: 10px 15px;
+    border-left: 3px solid #FFF19B;
+}
+
+.property-value {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.5;
+    padding-left: 0;
+}
+
+/* Подвал */
+.footer {
+    background-image: url("../image/navbar.PNG");
+    color: #000;
+    padding: 40px 5% 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 30px;
+    position: relative;
+}
+
+.footer-logo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.footer-logo span {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    display: block;
+    background: linear-gradient(135deg, #FFF19B, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footer-logo p {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.footer-links-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.footer-links-group h4 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: #000;
+    font-weight: 600;
+}
+
+.footer-links-group a {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: #333;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+    padding: 8px 0;
+    font-weight: 500;
+}
+
+.footer-links-group a:hover {
+    color: #FFF19B;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    align-items: center;
+}
+
+.social-links a {
+    color: #333;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    padding: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    min-height: 50px;
+    text-decoration: none;
+}
+
+.social-links a:hover {
+    color: #FFF19B;
+    transform: translateY(-5px) scale(1.1);
+    background: rgba(255, 241, 155, 0.2);
+    box-shadow: 0 5px 15px rgba(255, 241, 155, 0.3);
+}
+
+/* Анимации */
+@keyframes modalFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    nav {
+        padding: 0 3%;
+    }
+    .weapon-grid,
+    .artifacts-grid,
+    .armor-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .weapon-image {
+        max-width: 110px;
+    }
+    .artifact-image,
+    .armor-image {
+        max-width: 90px;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .footer-links-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+        padding: 5px 0;
+    }
+
+    .nav-links>li>a {
+        padding: 8px 10px;
+    }
+
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        display: none;
+        box-shadow: none;
+        margin-top: 5px;
+    }
+    .weapon-title,
+    .artifacts-title,
+    .armor-title {
+        font-size: 28px;
+    }
+
+    .modal-content {
+        padding: 12px 15px 15px;
+        width: 95%;
+    }
+
+    .modal-content-inner {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .modal-right {
+        padding-left: 0;
+        padding-top: 15px;
+        border-left: none;
+        border-top: 1px solid rgba(255, 225, 0, 0.1);
+    }
+
+    .modal-title {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .modal-title::before {
+        display: none;
+    }
+    
+    .footer {
+        padding: 30px 3% 15px;
+    }
+    
+    .footer-content {
+        gap: 25px;
+        padding-bottom: 20px;
+    }
+    
+    .footer-logo span {
+        font-size: 1.6rem;
+    }
+    
+    .footer-logo p {
+        font-size: 1rem;
+    }
+    
+    .footer-links-group h4 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .footer-links-group a {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+    
+    .social-links {
+        gap: 20px;
+    }
+    
+    .social-links a {
+        font-size: 1.3rem;
+        padding: 10px;
+        min-width: 45px;
+        min-height: 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .weapon-grid,
+    .artifacts-grid,
+    .armor-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        padding: 10px;
+    }
+    .weapon-card,
+    .artifact-card,
+    .armor-card {
+        padding: 8px;
+    }
+    .weapon-image {
+        max-width: 100px;
+    }
+    .artifact-image,
+    .armor-image {
+        max-width: 80px;
+    }
+    .weapon-title,
+    .artifacts-title,
+    .armor-title {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .category-tab {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .modal-content {
+        padding: 10px 12px 12px;
+    }
+
+    #modalWeaponImage,
+    #modalArtifactImage,
+    #modalArmorImage {
+        max-width: 200px;
+        margin-bottom: 10px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 360px) {
+    .weapon-grid,
+    .artifacts-grid,
+    .armor-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    .weapon-name,
+    .artifact-name,
+    .armor-name {
+        font-size: 12px;
+    }
+    .weapon-image {
+        max-width: 90px;
+    }
+}

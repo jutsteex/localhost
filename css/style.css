@@ -1,0 +1,678 @@
+@font-face {
+    font-family: 'Manrope';
+    src: url('../fonts/Manrope.ttf');
+    font-weight: 400 700;
+    font-style: regular;
+}
+
+@font-face {
+    font-family: 'Oswald';
+    src: url('../fonts/Oswald.ttf');
+    font-weight: 400 700;
+    font-style: Medium;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Manrope', sans-serif;
+    background-color: #2F2B28;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+}
+
+/* Навигация */
+nav {
+    background-image: url("../image/navbar.PNG");
+    padding: 0 5%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo {
+    color: #000000;
+    font-size: 24px;
+    font-weight: 700;
+    padding: 20px 0;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-family: 'Manrope', "oswald", sans-serif;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.nav-links li {
+    position: relative;
+    padding: 10px 0;
+}
+
+.nav-links>li>a {
+    color: #000000;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    display: block;
+}
+
+.nav-links li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #000000;
+}
+
+/* Выпадающее меню */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #fff;
+    width: 200px;
+    list-style: none;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    z-index: 100;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.dropdown-menu li {
+    width: 100%;
+    padding: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu li a {
+    display: block;
+    color: #2c3e50;
+    padding: 12px 15px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu li a:hover {
+    background: #FFF19B;
+    color: black;
+    padding-left: 20px;
+}
+
+.nav-links li:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-toggle::after {
+    content: "▼";
+    font-size: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* Герой секция с видео */
+.hero {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 20px;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../image/background.jpg') no-repeat center center;
+    background-size: cover;
+    overflow: hidden;
+}
+
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    /* Плавное появление видео после загрузки */
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.hero-video.loaded {
+    opacity: 1;
+}
+
+/* Если видео не загрузилось */
+.no-video .hero-video {
+    display: none;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(0 0 0 / 65%);
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: #eee;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.btn.primary {
+    background-color: #FFF19B;
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: #FFF19B;
+    transform: translateY(-2px);
+}
+
+.btn.secondary {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.btn.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Основное содержимое */
+.main-content {
+    flex: 1;
+    padding: 50px 5%;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-header h2 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    color: #ddd;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Сетка фич */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 60px;
+}
+
+.feature-card {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(122, 102, 6, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: #FFF19B;
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: #FFF19B;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.feature-card p {
+    color: #ccc;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #FFF19B;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.feature-link:hover {
+    color: #FFF19B;
+    gap: 10px;
+}
+
+/* Карусель новостей */
+.news-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: #FFF19B rgba(0, 0, 0, 0.1);
+}
+
+.news-carousel::-webkit-scrollbar {
+    height: 6px;
+}
+
+.news-carousel::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.news-carousel::-webkit-scrollbar-thumb {
+    background-color: #FFF19B;
+    border-radius: 10px;
+}
+
+.news-card {
+    min-width: 300px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 25px;
+    border: 1px solid rgba(122, 102, 6, 0.3);
+    transition: all 0.3s ease;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    border-color: #FFF19B;
+}
+
+.news-date {
+    font-size: 0.9rem;
+    color: #FFF19B;
+    margin-bottom: 10px;
+}
+
+.news-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.news-card p {
+    color: #ccc;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.news-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #FFF19B;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.news-link:hover {
+    color: #FFF19B;
+    gap: 10px;
+}
+
+/* Подвал */
+.footer {
+    background-image: url("../image/navbar.PNG");
+    color: #000;
+    padding: 40px 5% 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 30px;
+    position: relative;
+}
+
+.footer-logo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.footer-logo span {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    display: block;
+    background: linear-gradient(135deg, #FFF19B, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footer-logo p {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.footer-links-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.footer-links-group h4 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: #000;
+    font-weight: 600;
+}
+
+
+
+.footer-links-group a {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: #333;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+    padding: 8px 0;
+    font-weight: 500;
+}
+
+
+
+.footer-links-group a:hover {
+    color: #FFF19B;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+}
+
+
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    align-items: center;
+}
+
+.social-links a {
+    color: #333;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    padding: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    min-height: 50px;
+    text-decoration: none;
+}
+
+.social-links a:hover {
+    color: #FFF19B;
+    transform: translateY(-5px) scale(1.1);
+    background: rgba(255, 241, 155, 0.2);
+    box-shadow: 0 5px 15px rgba(255, 241, 155, 0.3);
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    nav {
+        padding: 0 3%;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .footer-links-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .footer {
+        padding: 30px 3% 15px;
+    }
+    
+    .footer-content {
+        gap: 25px;
+        padding-bottom: 20px;
+    }
+    
+    .footer-logo span {
+        font-size: 1.6rem;
+    }
+    
+    .footer-logo p {
+        font-size: 1rem;
+    }
+    
+    .footer-links-group h4 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .footer-links-group a {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+    
+    .social-links {
+        gap: 20px;
+    }
+    
+    .social-links a {
+        font-size: 1.3rem;
+        padding: 10px;
+        min-width: 45px;
+        min-height: 45px;
+        text-decoration: none;
+    }
+    
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+        padding: 5px 0;
+    }
+
+    .nav-links>li>a {
+        padding: 8px 10px;
+    }
+
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        display: none;
+        box-shadow: none;
+        margin-top: 5px;
+    }
+
+    .hero {
+        height: auto;
+        padding: 100px 20px;
+    }
+
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .feature-card,
+    .news-card {
+        padding: 20px;
+    }
+    
+    .footer {
+        padding: 20px 5% 0;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .footer-links-group {
+        margin-bottom: 15px;
+    }
+}

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | STALCUBE.WIKI</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../image/site.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <nav>
+        <div class="navbar">
+            <a href="../index.html" class="logo">
+                <span>STALCUBE.WIKI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Главная</a></li>
+                <li><a href="https://stalcube.su/">Сайт игры</a></li>
+                <li>
+                    <a href="#" class="dropdown-toggle">Разделы </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="./index1.html">Артефакты</a></li>
+                        <li><a href="./index2.html">Броня и костюмы</a></li>
+                        <li><a href="./index3.html">Оружие</a></li>
+                        <li><a href="./faq.html">FAQ</a></li>
+                        <li><a href="./obvesy.html">Обвесы</a></li>
+                        <li><a href="./mutants.html">Мутанты</a></li>
+                        <li><a href="./news.html">Статьи и гайды</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+    <a href="#" class="dropdown-toggle">Инструменты</a>
+    <ul class="dropdown-menu">
+        
+        <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
+        <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
+        <li><a href="srav.html">Сравнение предметов</a></li>
+    </ul>
+</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Герой-секция -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>ЧАСТО ЗАДАВАЕМЫЕ ВОПРОСЫ</h1>
+            <p>Найдите ответы на самые популярные вопросы по игре STALCUBE</p>
+        </div>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Основное содержимое -->
+    <main class="main-content">
+        <section class="faq-section">
+            <div class="section-header">
+                <h2>Частые вопросы</h2>
+                <p>Если вы не нашли ответ на свой вопрос, вы можете задать его в нашем Discord-сообществе</p>
+            </div>
+
+            <div class="faq-container" id="faqContainer">
+                <!-- FAQ items will be loaded here from JSON -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Подвал страницы -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>STALCUBE.WIKI</span>
+                <p>Руководство по игре STALCUBE</p>
+            </div>
+
+            <div class="footer-links-container">
+                <div class="footer-links-group">
+                    <h4>Навигация</h4>
+                    <a href="../index.html">Главная</a>
+                    <a href="./news.html">Статьи</a>
+                    <a href="./srav.html">Сравнение предметов</a>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4>Ресурсы</h4>
+                    <a href="https://stalcube.su/">Официальный сайт</a>
+                    <a href="https://cubecalc.ru/">Калькулятор сборок</a>
+                    <a href="https://cubemaps.ru/">Интерактивная карта</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="social-links">
+                <a href="https://vk.com/stalcube.official"><i class="fab fa-vk"></i></a>
+                <a href="https://discord.gg/stalcube"><i class="fab fa-discord"></i></a>
+                <a href="https://www.youtube.com/@stalcube_game"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Load FAQ data from JSON and display it
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('../data/faq.json')
+                .then(response => response.json())
+                .then(data => {
+                    const faqContainer = document.getElementById('faqContainer');
+
+                    data.forEach((item, index) => {
+                        const faqItem = document.createElement('div');
+                        faqItem.className = 'faq-item';
+                        faqItem.innerHTML = `
+                            <div class="faq-question">
+                                <h3>${item.question}</h3>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>${item.answer}</p>
+                            </div>
+                        `;
+                        faqContainer.appendChild(faqItem);
+
+                        // Add click event to toggle answer
+                        const question = faqItem.querySelector('.faq-question');
+                        const answer = faqItem.querySelector('.faq-answer');
+                        const icon = faqItem.querySelector('.fa-chevron-down');
+
+                        question.addEventListener('click', () => {
+                            answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+                            icon.style.transform = answer.style.display === 'block' ? 'rotate(180deg)' : 'rotate(0deg)';
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading FAQ data:', error);
+                    document.getElementById('faqContainer').innerHTML =
+                        '<p>Не удалось загрузить данные FAQ. Пожалуйста, попробуйте позже.</p>';
+                });
+        });
+    </script>
+
+    <style>
+        /* FAQ specific styles */
+        .faq-item {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(122, 102, 6, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: #FFF19B;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+
+        .faq-question h3 {
+            font-size: 1.2rem;
+            color: #FFF19B;
+            margin: 0;
+        }
+
+        .faq-question i {
+            color: #FFF19B;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-answer {
+            display: none;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255, 225, 0, 0.2);
+            margin-top: 10px;
+        }
+
+        .faq-answer p {
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .faq-question h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</body>
+
+</html>

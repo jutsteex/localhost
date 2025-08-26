@@ -1,0 +1,102 @@
+/* Анимация пульсации для изображений артефактов в карточках */
+.artifact-image {
+    animation: imagePulse 3s infinite ease-in-out;
+}
+
+/* Общие настройки анимации */
+@keyframes imagePulse {
+    0% {
+        filter: brightness(1) drop-shadow(0 0 0 rgba(255, 241, 155, 0));
+    }
+
+    50% {
+        filter: brightness(1.1) drop-shadow(0 0 8px rgba(255, 241, 155, 0.5));
+    }
+
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0 rgba(255, 241, 155, 0));
+    }
+}
+
+/* Анимации для разных категорий */
+.artifact-card[data-categories*="bio"] .artifact-image {
+    animation: bioPulse 3s infinite ease-in-out;
+}
+
+.artifact-card[data-categories*="electro"] .artifact-image {
+    animation: electroPulse 3s infinite ease-in-out;
+}
+
+.artifact-card[data-categories*="term"] .artifact-image {
+    animation: termPulse 3s infinite ease-in-out;
+}
+
+.artifact-card[data-categories*="other"] .artifact-image {
+    animation: otherPulse 3s infinite ease-in-out;
+}
+
+/* Без анимации scale для модального окна */
+#modalArtifactImage,
+.modal-content[data-category="bio"] #modalArtifactImage,
+.modal-content[data-category="electro"] #modalArtifactImage,
+.modal-content[data-category="term"] #modalArtifactImage,
+.modal-content[data-category="other"] #modalArtifactImage {
+    animation: none !important;
+    transform: none !important;
+    filter: brightness(1) drop-shadow(0 0 0 rgba(0, 0, 0, 0));
+}
+
+/* Убираем свечение у артефактов без категорий bio, electro, term, grav */
+.artifact-card:not([data-categories*="bio"]):not([data-categories*="electro"]):not([data-categories*="term"]):not([data-categories*="grav"]) .artifact-image {
+    animation: none !important;
+    filter: none !important;
+}
+
+/* Анимации категорий карточек */
+@keyframes bioPulse {
+
+    0%,
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0 rgba(50, 255, 50, 0));
+    }
+
+    50% {
+        filter: brightness(1.15) drop-shadow(0 0 12px rgba(50, 255, 50, 0.8));
+    }
+}
+
+@keyframes electroPulse {
+
+    0%,
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0 rgba(80, 120, 255, 0));
+    }
+
+    50% {
+        filter: brightness(1.15) drop-shadow(0 0 12px rgba(80, 120, 255, 0.8));
+    }
+}
+
+@keyframes termPulse {
+
+    0%,
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0 rgba(255, 60, 60, 0));
+    }
+
+    50% {
+        filter: brightness(1.15) drop-shadow(0 0 12px rgba(255, 60, 60, 0.8));
+    }
+}
+
+@keyframes otherPulse {
+
+    0%,
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0 rgba(220, 220, 220, 0));
+    }
+
+    50% {
+        filter: brightness(1.15) drop-shadow(0 0 12px rgba(220, 220, 220, 0.8));
+    }
+}

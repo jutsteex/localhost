@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оружие | STALCUBE.WIKI</title>
+    <link rel="stylesheet" href="../css/style1.css">
+    <link rel="icon" href="../image/site.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <nav>
+        <div class="navbar">
+            <a href="../index.html" class="logo">
+                <span>STALCUBE.WIKI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Главная</a></li>
+                <li><a href="https://stalcube.su/">Сайт игры</a></li>
+                <li>
+                    <a href="#" class="dropdown-toggle">Разделы </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="./index1.html">Артефакты</a></li>
+                        <li><a href="./index2.html">Броня и костюмы</a></li>
+                        <li><a href="./index3.html">Оружие</a></li>
+                        <li><a href="./faq.html">FAQ</a></li>
+                        <li><a href="./obvesy.html">Обвесы</a></li>
+                        <li><a href="./mutants.html">Мутанты</a></li>
+                        <li><a href="./news.html">Статьи и гайды</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+    <a href="#" class="dropdown-toggle">Инструменты</a>
+    <ul class="dropdown-menu">
+        
+        <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
+        <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
+         <li><a href="srav.html">Сравнение предметов</a></li>
+    </ul>
+</li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="weapon-container">
+        <h1 class="weapon-title">Оружие</h1>
+
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">Все</div>
+            <div class="category-tab" data-category="sniper">Снайперские винтовки</div>
+            <div class="category-tab" data-category="assault">Штурмовые винтовки</div>
+            <div class="category-tab" data-category="pistols">Пистолеты</div>
+            <div class="category-tab" data-category="droboviki">Дробовики</div>
+            <div class="category-tab" data-category="pulemety">Пулеметы</div>
+            <div class="category-tab" data-category="pp">Пистолеты-пулеметы</div>
+        </div>
+
+        <div class="weapon-grid-container">
+            <div class="weapon-grid" id="weaponGrid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Остальные карточки... -->
+    </div>
+    </div>
+    </div>
+
+    <div id="weaponModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalWeaponTitle" class="modal-title"></h2>
+            <div class="modal-content-inner">
+                <div class="modal-left">
+                    <img id="modalWeaponImage" src="" alt="" class="weapon-image">
+                    <p id="modalWeaponDescription" class="modal-description"></p>
+                </div>
+                <div class="modal-right">
+                    <h3 class="property-title" style="text-align: center; margin-bottom: 20px;">Характеристики</h3>
+                    <div id="modalWeaponProperties" class="weapon-properties"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подвал страницы -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>STALCUBE.WIKI</span>
+                <p>Руководство по игре STALCUBE</p>
+            </div>
+
+            <div class="footer-links-container">
+                <div class="footer-links-group">
+                    <h4>Навигация</h4>
+                    <a href="../index.html">Главная</a>
+                    <a href="./news.html">Статьи</a>
+                    <a href="./srav.html">Сравнение предметов</a>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4>Ресурсы</h4>
+                    <a href="https://stalcube.su/">Официальный сайт</a>
+                    <a href="https://cubecalc.ru/">Калькулятор сборок</a>
+                    <a href="https://cubemaps.ru/">Интерактивная карта</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="social-links">
+                <a href="https://vk.com/stalcube.official"><i class="fab fa-vk"></i></a>
+                <a href="https://discord.gg/stalcube"><i class="fab fa-discord"></i></a>
+                <a href="https://www.youtube.com/@stalcube_game"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+    <script src="../js/weapon.js"></script>
+</body>
+
+</html>
