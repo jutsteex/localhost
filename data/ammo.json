@@ -1,0 +1,11 @@
+{
+  "ammo": [
+    { "type": "9мм", "armorPiercing": 0.12 },
+    { "type": "12.7x108", "armorPiercing": 0.4 },
+    { "type": "Аккумулятор", "armorPiercing": 0.65 },
+    { "type": "7мм", "armorPiercing": 0.2 },
+    { "type": "5мм", "armorPiercing": 0.15 },
+    { "type": "20x110", "armorPiercing": 0.4 },
+    { "type": "Жакан", "armorPiercing": 0.2 }
+  ]
+}

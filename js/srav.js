@@ -17,6 +17,7 @@ const artifactSearch = document.getElementById('artifact-search');
 let currentSelector = null;
 let selectedItems = { selector1: null, selector2: null };
 let currentType = 'artifacts';
+let ammoData = [];
 let allItems = [];
 let customArmorPiercing = { selector1: null, selector2: null };
 let detailedChart = null;
@@ -60,14 +61,21 @@ function createChart(ctx, type, data, options, oldChart) {
   oldChart?.destroy();
   return new Chart(ctx.getContext('2d'), { type, data, options });
 }
+function loadAmmo() {
+  return fetch('../data/ammo.json')
+    .then(r => r.json())
+    .then(data => { ammoData = data.ammo; });
+}
 
 // ===============================
 // Инициализация
 // ===============================
 document.addEventListener('DOMContentLoaded', () => {
-  initEventListeners();
-  loadItems();
-  initDetailedChartControls();
+  loadAmmo().then(() => {
+    initEventListeners();
+    loadItems();
+    initDetailedChartControls();
+  });
 });
 
 function initEventListeners() {
@@ -218,10 +226,7 @@ function selectItem(item) {
             <option value="basic">+15</option>
           </select>
         </div>
-        <div class="custom-ap-input">
-          <label>Бронебойность (%):</label>
-          <input type="number" id="${currentSelector}-ap" min="0" max="100" placeholder="Авто">
-        </div>` : ''}
+        ` : ''}
     `;
 
     document.getElementById(`${currentSelector}-ap`)?.addEventListener('change', e => {
@@ -275,12 +280,20 @@ function applyEnhancement(weapon, selector) {
   return weapon;
 }
 
+function getTotalArmorPiercing(weapon) {
+  const dmg = extractDamageStats(weapon.xaract);
+  const extraAP = dmg.armorPiercing; // из xaract
+  const ammo = ammoData.find(a => a.type === weapon.ammoType);
+  const ammoAP = ammo ? ammo.armorPiercing : 0;
+  return extraAP + ammoAP;
+}
+
 function calculateMetrics(weapon, bulletResist, targetHP, selectorOverride) {
   const dmg = extractDamageStats(weapon.xaract);
   const rof = extractRateOfFire(weapon.xaract);
   const hsMult = extractHeadshotMultiplier(weapon.xaract);
   const selector = selectorOverride || (selectedItems.selector1 === weapon ? 'selector1' : 'selector2');
-  const ap = customArmorPiercing[selector] ?? dmg.armorPiercing;
+  const ap = getTotalArmorPiercing(weapon);
   const effHP = ((bulletResist - (bulletResist * ap)) + 100) * (targetHP / 100);
   const calc = (damage, mult = 1) => ({ dps: (damage * rof / 60) * mult, ttk: (effHP / (damage * mult)) * (60 / rof) });
   const close = calc(dmg.closeDamage), far = calc(dmg.farDamage);
