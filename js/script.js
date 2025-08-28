@@ -1,16 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Мобильное меню
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-    });
-
-    // Закрытие меню при клике на ссылку
+    // Убрали код с hamburger, так как его нет в разметке
+    
+    // Закрытие меню при клике на ссылку (если нужно для мобильного меню)
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
-            navLinks.classList.remove('active');
+            // Если у вас будет мобильное меню, можно добавить логику здесь
         });
     });
 
@@ -20,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.getAttribute('href') === '#') return;
 
             const targetId = this.getAttribute('href');
+            // Исключаем внешние ссылки
+            if (targetId.startsWith('http') || targetId.startsWith('//')) return;
+            
             const targetElement = document.querySelector(targetId);
 
             if (targetElement) {

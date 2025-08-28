@@ -1,3 +1,4 @@
+/* Основные стили, наследуемые из style.css */
 .news-main {
     flex: 1;
     background: rgba(0, 0, 0, 0.7);
@@ -5,7 +6,7 @@
 }
 
 .news-header {
-    background-color: #2F2B28;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../image/background.jpg') no-repeat center center;
     background-size: cover;
     padding: 80px 0;
     text-align: center;
@@ -14,9 +15,11 @@
 }
 
 .news-header h1 {
+    font-family: 'Oswald', sans-serif;
     font-size: 2.5rem;
     margin-bottom: 15px;
     color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .news-header p {
@@ -45,8 +48,8 @@
 }
 
 .filter-btn {
-    padding: 12px 50px;
-    background: rgb(161 135 135 / 10%);
+    padding: 10px 35px;
+    background: rgba(161, 135, 135, 0.1);
     color: white;
     border-radius: 5px;
     cursor: pointer;
@@ -54,12 +57,15 @@
     font-weight: 500;
     font-size: 20px;
     text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    border: none;
+    font-family: 'Manrope', sans-serif;
 }
 
 .filter-btn:hover,
 .filter-btn.active {
     background: #FFF19B;
     color: #000000;
+    transform: translateY(-2px);
 }
 
 .news-grid {
@@ -71,10 +77,10 @@
 
 .news-card {
     background: rgba(0, 0, 0, 0.6);
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     border: 1px solid rgba(122, 102, 6, 0.3);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
     cursor: pointer;
     display: flex;
     flex-direction: row;
@@ -83,7 +89,8 @@
 
 .news-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(122, 102, 6, 0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: #FFF19B;
 }
 
 .card-image-container {
@@ -107,7 +114,7 @@
 }
 
 .card-content {
-    padding: 20px;
+    padding: 30px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -115,31 +122,43 @@
 }
 
 .card-date {
-    color: #FFf;
+    color: #FFF19B;
     font-size: 0.9rem;
     margin-bottom: 10px;
 }
 
 .card-title {
-    font-size: 1.3rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.4rem;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     line-height: 1.3;
 }
 
 .card-description {
-    color: #ddd;
-    line-height: 1.5;
-    margin-bottom: 15px;
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 20px;
     flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
 }
 
-/* ÐœÐ¾Ð´Ð°Ð»ÑŒÐ½Ð¾Ðµ Ð¾ÐºÐ½Ð¾ */
+.read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #FFF19B;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: auto;
+}
+
+.read-more:hover {
+    color: #FFF19B;
+    gap: 10px;
+}
+
+/* Модальное окно */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -164,14 +183,26 @@
 
 .modal-container {
     background: rgba(0, 0, 0, 0.9);
-    border-radius: 8px;
+    border-radius: 10px;
     max-width: 800px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     border: 1px solid #FFF19B;
     position: relative;
-    padding: 25px;
+    padding: 30px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #FFF19B;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
 }
 
 .modal-image-container {
@@ -179,8 +210,8 @@
     height: 400px;
     position: relative;
     overflow: hidden;
-    border-radius: 4px;
-    margin: -20px 0 20px 0;
+    border-radius: 8px;
+    margin-bottom: 25px;
     background: rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: center;
@@ -195,12 +226,13 @@
 }
 
 .modal-date {
-    color: #fff;
+    color: #FFF19B;
     font-size: 0.9rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .modal-title {
+    font-family: 'Oswald', sans-serif;
     font-size: 1.8rem;
     color: #fff;
     margin-bottom: 20px;
@@ -213,8 +245,9 @@
 }
 
 .modal-content h3 {
-    color: #FFf;
+    color: #FFF19B;
     margin: 25px 0 15px;
+    font-family: 'Oswald', sans-serif;
     font-size: 1.4rem;
 }
 
@@ -227,18 +260,18 @@
     margin-bottom: 8px;
 }
 
-/* Ð¡Ñ‚Ð¸Ð»Ð¸ Ð´Ð»Ñ Ð¸Ð·Ð¾Ð±Ñ€Ð°Ð¶ÐµÐ½Ð¸Ð¹ Ð²Ð½ÑƒÑ‚Ñ€Ð¸ ÐºÐ¾Ð½Ñ‚ÐµÐ½Ñ‚Ð° */
+/* Стили для изображений внутри контента */
 .modal-content img.content-image {
     width: 100%;
     max-height: 400px;
     object-fit: contain;
     margin: 20px 0;
     border-radius: 8px;
-    border: 1px solid #FEEE75;
+    border: 1px solid #FFF19B;
     background: rgba(0, 0, 0, 0.2);
 }
 
-/* ÐÐ´Ð°Ð¿Ñ‚Ð°Ñ†Ð¸Ð¸ */
+/* Адаптивность */
 @media (max-width: 1024px) {
     .card-image-container {
         width: 250px;
@@ -250,25 +283,25 @@
         padding: 60px 0;
     }
 
-    .modal-image-container {
-        height: 300px;
-        margin: -15px 0 15px 0;
-    }
-
-    .modal-content img.content-image {
-        max-height: 250px;
-    }
-
     .news-header h1 {
         font-size: 2rem;
     }
 
+    .modal-image-container {
+        height: 300px;
+        margin-bottom: 20px;
+    }
+
     .modal-container {
-        padding: 20px;
+        padding: 25px;
     }
 
     .modal-title {
         font-size: 1.5rem;
+    }
+
+    .modal-content img.content-image {
+        max-height: 250px;
     }
 }
 
@@ -292,9 +325,21 @@
         font-size: 1.8rem;
     }
 
+    .filter-btn {
+        padding: 10px 30px;
+        font-size: 16px;
+    }
+
+    .card-content {
+        padding: 20px;
+    }
+
     .modal-image-container {
         height: 200px;
-        margin: -10px 0 10px 0;
+    }
+
+    .modal-container {
+        padding: 20px;
     }
 
     .modal-title {

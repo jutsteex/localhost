@@ -20,7 +20,7 @@
 
 body {
     font-family: 'Manrope', sans-serif;
-    background-color: #2F2B28;
+    background-color: #24211f; /* цвет фона */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -30,6 +30,33 @@ body {
     display: flex;
     flex-direction: column;
     color: #fff;
+}
+
+/* Стили для скроллбара */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(36, 33, 31, 0.8);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #FFF19B;
+    border-radius: 6px;
+    border: 2px solid rgba(36, 33, 31, 0.8);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e6d98a;
+}
+
+/* Для Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #FFF19B rgba(36, 33, 31, 0.8);
 }
 
 h1,
@@ -91,8 +118,9 @@ nav {
 }
 
 .nav-links li a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #000000;
+    background: #ccc48d; /* Желтый фон при наведении */
+    color: #000000; /* Черный текст */
+    transform: translateY(-1px);
 }
 
 /* Выпадающее меню */
@@ -527,6 +555,8 @@ nav {
     background: rgba(255, 241, 155, 0.2);
     box-shadow: 0 5px 15px rgba(255, 241, 155, 0.3);
 }
+
+
 
 /* Адаптивность */
 @media (max-width: 1024px) {

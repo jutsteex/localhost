@@ -26,8 +26,6 @@
                         <li><a href="./index2.html">Броня и костюмы</a></li>
                         <li><a href="./index3.html">Оружие</a></li>
                         <li><a href="./faq.html">FAQ</a></li>
-                        <li><a href="./obvesy.html">Обвесы</a></li>
-                        <li><a href="./mutants.html">Мутанты</a></li>
                         <li><a href="./news.html">Статьи и гайды</a></li>
                     </ul>
                 </li>
@@ -168,7 +166,7 @@
 
         .faq-question h3 {
             font-size: 1.2rem;
-            color: #FFF19B;
+            color: #d1d1d1;
             margin: 0;
         }
 
@@ -188,6 +186,78 @@
             color: #ddd;
             line-height: 1.6;
         }
+        
+        /* Стили для ссылок внутри FAQ */
+.faq-answer a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(255, 241, 155, 0.3);
+    padding-bottom: 2px;
+}
+
+.faq-answer a:hover {
+    color: #ffffff;
+    border-bottom-color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* Стили для внешних ссылок (иконка внешней ссылки) */
+.faq-answer a[href^="http"]:not([href*="stalcube.wiki"]):not([href*="localhost"])::after {
+    content: " ↗";
+    font-size: 0.9em;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.faq-answer a[href^="http"]:not([href*="stalcube.wiki"]):not([href*="localhost"]):hover::after {
+    transform: translate(2px, -2px);
+}
+
+/* Стили для внутренних ссылок */
+.faq-answer a[href*="stalcube.wiki"],
+.faq-answer a[href*="localhost"],
+.faq-answer a[href^="./"],
+.faq-answer a[href^="../"] {
+    color: #ffffff;
+    border-bottom-color: rgba(255, 215, 0, 0.3);
+}
+
+.faq-answer a[href*="stalcube.wiki"]:hover,
+.faq-answer a[href*="localhost"]:hover,
+.faq-answer a[href^="./"]:hover,
+.faq-answer a[href^="../"]:hover {
+    color: #ffffff;
+    border-bottom-color: #ffffff;
+}
+
+/* Стили для Discord ссылок */
+.faq-answer a[href*="discord"] {
+    color: #ffffff;
+    border-bottom-color: rgba(88, 101, 242, 0.3);
+}
+
+.faq-answer a[href*="discord"]:hover {
+    color: #ffffff;
+    border-bottom-color: #ffffff;
+}
+
+/* Стили для важных ссылок */
+.faq-answer a.important-link {
+    background: linear-gradient(45deg, #ffffff, #ffffff);
+    color: #000 !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border-bottom: none;
+    font-weight: 700;
+}
+
+.faq-answer a.important-link:hover {
+    background: linear-gradient(45deg, #ffffff, #ffffff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 241, 155, 0.3);
+}
 
         @media (max-width: 768px) {
             .faq-question h3 {
