@@ -1,30 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Википедия STALCUBE</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="icon" href="./image/site.png">
+    <link rel="stylesheet" href="./css/styleforindex.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .grunge-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("../image/grunge-grid.png");
-            background-size: cover;
-            background-position: center;
-            opacity: 0.1;
-            /* Настраиваемая прозрачность */
-            z-index: 2;
-            pointer-events: none;
-            /* не мешает кликам по элементам */
-        }
-    </style>
 </head>
 
 <body>
@@ -34,10 +15,10 @@
                 <span>STALCUBE.WIKI</span>
             </a>
             <ul class="nav-links">
-                <li><a href="#">Главная</a></li>
+                <li><a href="./index.html">Главная</a></li>
                 <li><a href="https://stalcube.su/">Сайт игры</a></li>
-                <li>
-                    <a href="#" class="dropdown-toggle">Разделы </a>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Разделы <i class="fas fa-chevron-down"></i></a>
                     <ul class="dropdown-menu">
                         <li><a href="./pages/index1.html">Артефакты</a></li>
                         <li><a href="./pages/index2.html">Броня и костюмы</a></li>
@@ -46,42 +27,58 @@
                         <li><a href="./pages/news.html">Статьи и гайды</a></li>
                     </ul>
                 </li>
-
                 <li class="dropdown">
-    <a href="#" class="dropdown-toggle">Инструменты</a>
-    <ul class="dropdown-menu">
-        
-        <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
-        <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
-        <li><a href="./pages/srav.html">Сравнение предметов</a></li>
-    </ul>
-</li>
+                    <a href="#" class="dropdown-toggle">Инструменты <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
+                        <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
+                        <li><a href="./pages/srav.html">Сравнение предметов</a></li>
+                    </ul>
+                </li>
             </ul>
-
         </div>
     </nav>
 
-    <!-- Герой-секция с видео и фолбэком -->
-     <section class="hero">
-        <video class="hero-video" autoplay muted loop playsinline poster="./image/background.jpg">
-            <source src="./video/1080.mp4" type="video/mp4">
-            <source src="./video/1080.webm" type="video/webm">
-            Ваш браузер не поддерживает видео.
-        </video>
-        <div class="hero-overlay"></div>
-        <div class="grunge-overlay"></div>
-        <div class="hero-content">
-            <h1>STALCUBE.WIKI</h1>
-            <p>Полное руководство по игре, артефактам, оружию и тактикам выживания</p>
+    <!-- Карусель -->
+    <section class="hero-carousel">
+        <div class="carousel-slides">
+            <div class="carousel-slide">
+                <div class="carousel-content">
+                    <h2>Интерактивная карта</h2>
+                    <p>Полная карта всех локаций с отметками артефактов, мутантов и важных точек</p>
+                    <a href="https://cubemaps.ru/" class="btn primary">Исследовать карты</a>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <div class="carousel-content">
+                    <h2>Калькулятор сборок</h2>
+                    <p>Создавайте оптимальные сборки оружия и рассчитывайте их характеристики</p>
+                    <a href="https://cubecalc.ru/" class="btn primary">Создать сборку</a>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <div class="carousel-content">
+                    <h2>Сравнение предметов</h2>
+                    <p>Сравните характеристики оружия, скинов и агентов. Найдите лучшие варианты для вашего стиля игры</p>
+                    <a href="./pages/srav.html" class="btn primary">Сравнить предметы</a>
+                </div>
+            </div>
         </div>
+        <div class="carousel-nav">
+            <div class="carousel-dot active"></div>
+            <div class="carousel-dot"></div>
+            <div class="carousel-dot"></div>
+        </div>
+        <button class="carousel-control prev"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-control next"><i class="fas fa-chevron-right"></i></button>
     </section>
 
     <!-- Основное содержимое -->
     <main class="main-content">
         <section class="features-section">
             <div class="section-header">
-                <h2>Основные разделы</h2>
-                <p>Выберите интересующий вас раздел для получения подробной информации</p>
+                <h2>Статьи и гайды</h2>
+                <p>Выберите интересующие вас статьи...</p>
             </div>
 
             <div class="features-grid">
@@ -89,90 +86,88 @@
                     <div class="feature-icon">
                         <i class="fas fa-map-marked-alt"></i>
                     </div>
-                    <h3>Интерактивная карта</h3>
-                    <p>Полная карта всех локаций с отметками артефактов, мутантов и важных точек</p>
-                    <a href="https://cubemaps.ru/" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
+                    <h3>-</h3>
+                    <p>-</p>
+                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-calculator"></i>
                     </div>
-                    <h3>Калькулятор сборок</h3>
-                    <p>Создавайте оптимальные сборки оружия и рассчитывайте их характеристики</p>
-                    <a href="https://cubecalc.ru/" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
+                    <h3>-</h3>
+                    <p>-</p>
+                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fa-duotone fa-solid fa-user"></i>
+                        <i class="fas fa-user"></i>
                     </div>
-                    <h3>Тех.поддержка</h3>
-                    <p>Со всеми багами обращаться <br>
-                        В тех.поддержку</p>
-                    <a href="https://vk.com/stalcube.official" class="feature-link">Перейти <i
-                            class="fas fa-arrow-right"></i></a>
+                    <h3>-</h3>
+                    <p>-</p>
+                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-newspaper"></i>
                     </div>
-                    <h3>Статьи</h3>
-                    <p>Последние статьи и предстоящие <br>
-                        события в игре</p>
-                    <a href="./pages/news.html" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
+                    <h3>-</h3>
+                    <p>-</p>
+                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
-        </section>
-
-
-        </div>
-
         </section>
     </main>
 
-    <!-- Подвал страницы -->
-    <footer class="footer">
+    <!-- Современный футер -->
+    <footer class="modern-footer">
         <div class="footer-content">
-            <div class="footer-logo">
-                <span>STALCUBE.WIKI</span>
-                <p>Руководство по игре STALCUBE</p>
+            <div class="footer-main">
+                <div class="footer-logo">STALCUBE.WIKI</div>
+                <p class="footer-description">Руководство по игре STALCUBE. Здесь вы найдете всю необходимую информацию об игре, артефактах, оружии и тактиках выживания.</p>
             </div>
-
-            <div class="footer-links-container">
-                <div class="footer-links-group">
-                    <h4>Навигация</h4>
-                    <a href="#">Главная</a>
-                    <a href="./pages/news.html">Статьи</a>
-                    <a href="./pages/srav.html">Сравнение предметов</a>
+            
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <h3>Навигация</h3>
+                    <ul class="footer-links">
+                        <li><a href="./index.html"><i class="fas fa-chevron-right"></i> Главная</a></li>
+                        <li><a href="./pages/news.html"><i class="fas fa-chevron-right"></i> Статьи</a></li>
+                        <li><a href="./pages/srav.html"><i class="fas fa-chevron-right"></i> Сравнение предметов</a></li>
+                    </ul>
                 </div>
-
-                <div class="footer-links-group">
-                    <h4>Ресурсы</h4>
-                    <a href="https://stalcube.su/">Официальный сайт</a>
-                    <a href="https://cubecalc.ru/">Калькулятор сборок</a>
-                    <a href="https://cubemaps.ru/">Интерактивная карта</a>
+                
+                <div class="footer-column">
+                    <h3>Ресурсы</h3>
+                    <ul class="footer-links">
+                        <li><a href="https://stalcube.su/"><i class="fas fa-chevron-right"></i> Официальный сайт</a></li>
+                        <li><a href="https://cubecalc.ru/"><i class="fas fa-chevron-right"></i> Калькулятор сборок</a></li>
+                        <li><a href="https://cubemaps.ru/"><i class="fas fa-chevron-right"></i> Интерактивная карта</a></li>
+                    </ul>
                 </div>
-
-
+                
+                <div class="footer-column">
+                    <h3>Поддержка</h3>
+                    <ul class="footer-links">
+                        <li><a href="https://vk.com/stalcube.official?from=search"><i class="fas fa-chevron-right"></i> Сообщить о проблеме</a></li>
+                    </ul>
+                </div>
             </div>
-        </div>
-
-        <div class="footer-bottom">
-
-            <div class="social-links">
-                <a href="https://vk.com/stalcube.official"><i class="fab fa-vk"></i></a>
-                <a href="https://discord.gg/stalcube"><i class="fab fa-discord"></i></a>
-                <a href="https://www.youtube.com/@stalcube_game"><i class="fab fa-youtube"></i></a>
+            
+            <div class="footer-social">
+                <a href="https://vk.com/stalcube.official?from=search" class="social-icon"><i class="fab fa-vk"></i></a>
+                <a href="https://discord.gg/stalcube" class="social-icon"><i class="fab fa-discord"></i></a>
+                <a href="https://www.youtube.com/@stalcube_game" class="social-icon"><i class="fab fa-youtube"></i></a>
             </div>
-
-
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 STALCUBE WIKI.               by spooler & CIDoRoViChev </p>
+            </div>
         </div>
     </footer>
 
-    <script src="./js/script.js"></script>
     <script src="./js/script1.js"></script>
 </body>
-
 </html>

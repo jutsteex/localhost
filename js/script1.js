@@ -1,60 +1,98 @@
+// Карусель
 document.addEventListener('DOMContentLoaded', function() {
-    const video = document.querySelector('.hero-video');
-    const heroSection = document.querySelector('.hero');
-
-    if (!video) {
-        console.error('Видео элемент не найден');
-        if (heroSection) heroSection.classList.add('no-video');
-        return;
-    }
-
-    // Функция для скрытия видео и показа фолбэка
-    function showFallback() {
-        console.log('Активирован фолбэк (изображение вместо видео)');
-        if (heroSection) heroSection.classList.add('no-video');
-    }
-
-    // Проверяем поддержку видео
-    const canPlay = video.canPlayType('video/mp4');
-    if (!canPlay) {
-        console.log('Браузер не поддерживает видео MP4');
-        showFallback();
-        return;
-    }
-
-    // Обработчики событий для видео
-    video.addEventListener('loadeddata', function() {
-        console.log('Видео загружено');
-        video.classList.add('loaded');
-        
-        // Пытаемся воспроизвести видео
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.error('Ошибка воспроизведения видео:', error);
-                showFallback();
-            });
-        }
-    });
-
-    video.addEventListener('error', function(e) {
-        console.error('Ошибка загрузки видео:', e);
-        showFallback();
-    });
-
-    video.addEventListener('canplay', function() {
-        console.log('Видео готово к воспроизведению');
-        video.classList.add('loaded');
-    });
-
-    // Начинаем загрузку видео
-    video.load();
+    const slides = document.querySelector('.carousel-slides');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const prevBtn = document.querySelector('.carousel-control.prev');
+    const nextBtn = document.querySelector('.carousel-control.next');
+    let currentSlide = 0;
+    let slideInterval;
     
-    // Таймаут на случай, если видео не загрузится
-    setTimeout(() => {
-        if (!video.classList.contains('loaded')) {
-            console.log('Таймаут загрузки видео');
-            showFallback();
+    // Функция перехода к слайду
+    function goToSlide(index) {
+        currentSlide = index;
+        slides.style.transform = `translateX(-${currentSlide * 33.333}%)`;
+        
+        // Обновляем активную точку
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentSlide);
+        });
+    }
+    
+    // Переход к следующему слайду
+    function nextSlide() {
+        goToSlide((currentSlide + 1) % 3);
+    }
+    
+    // Переход к предыдущему слайду
+    function prevSlide() {
+        goToSlide((currentSlide - 1 + 3) % 3);
+    }
+    
+    // Обработчики событий для кнопок
+    prevBtn.addEventListener('click', () => {
+        prevSlide();
+        resetInterval();
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        nextSlide();
+        resetInterval();
+    });
+    
+    // Обработчики событий для точек
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+            goToSlide(i);
+            resetInterval();
+        });
+    });
+    
+    // Автопереключение слайдов
+    function startInterval() {
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+    
+    function resetInterval() {
+        clearInterval(slideInterval);
+        startInterval();
+    }
+    
+    startInterval();
+    
+    // Остановка автопереключения при наведении
+    const carousel = document.querySelector('.hero-carousel');
+    carousel.addEventListener('mouseenter', () => clearInterval(slideInterval));
+    carousel.addEventListener('mouseleave', startInterval);
+    
+    // Выпадающие меню для мобильных устройств
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                const dropdown = this.nextElementSibling;
+                const isOpen = dropdown.style.display === 'block';
+                
+                // Закрываем все открытые dropdown
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+                
+                // Открываем/закрываем текущий dropdown
+                dropdown.style.display = isOpen ? 'none' : 'block';
+            }
+        });
+    });
+    
+    // Закрытие dropdown при клике вне его
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            if (!e.target.matches('.dropdown-toggle') && !e.target.closest('.dropdown-menu')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
         }
-    }, 5000);
+    });
 });
