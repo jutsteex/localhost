@@ -179,7 +179,7 @@ nav {
 /* Герой секция с каруселью */
 .hero-carousel {
     position: relative;
-    height: 70vh;
+    height: 50vh;
     min-height: 500px;
     overflow: hidden;
 }
