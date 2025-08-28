@@ -273,11 +273,24 @@ function calculateDamageAtDistance(weapon, distance) {
 function applyEnhancement(weapon, selector) {
   const enhanceSelect = document.getElementById(`${selector}-enhance`);
   if (!enhanceSelect || enhanceSelect.value === 'none') return weapon;
-  // Заготовка под применение бонусов (при необходимости модифицируйте weapon.xaract до рендера)
+
   const weaponType = weapon.categories?.[0]?.toLowerCase() || 'assault';
   const bonuses = enhancementBonuses[weaponType] || enhancementBonuses.assault;
-  // Применение бонусов может потребовать хранить числовые поля отдельно от текста xaract
-  return weapon;
+
+  // Копия, чтобы не портить оригинал
+  const enhanced = JSON.parse(JSON.stringify(weapon));
+  const dmgStats = extractDamageStats(enhanced.xaract);
+  const rof = extractRateOfFire(enhanced.xaract);
+
+  // Урон
+  dmgStats.closeDamage *= (1 + (bonuses.damage || 0));
+  dmgStats.farDamage   *= (1 + (bonuses.farDamage || 0));
+  enhanced._enhancedDamage = dmgStats;
+
+  // Скорострельность
+  enhanced._enhancedRof = rof * (1 + (bonuses.rateOfFire || 0));
+
+  return enhanced;
 }
 
 function getTotalArmorPiercing(weapon) {
@@ -289,15 +302,21 @@ function getTotalArmorPiercing(weapon) {
 }
 
 function calculateMetrics(weapon, bulletResist, targetHP, selectorOverride) {
-  const dmg = extractDamageStats(weapon.xaract);
-  const rof = extractRateOfFire(weapon.xaract);
+  const dmg = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
+  const rof = weapon._enhancedRof || extractRateOfFire(weapon.xaract);
   const hsMult = extractHeadshotMultiplier(weapon.xaract);
   const selector = selectorOverride || (selectedItems.selector1 === weapon ? 'selector1' : 'selector2');
   const ap = getTotalArmorPiercing(weapon);
+
   const effHP = ((bulletResist - (bulletResist * ap)) + 100) * (targetHP / 100);
-  const calc = (damage, mult = 1) => ({ dps: (damage * rof / 60) * mult, ttk: (effHP / (damage * mult)) * (60 / rof) });
+  const calc = (damage, mult = 1) => ({
+    dps: (damage * rof / 60) * mult,
+    ttk: (effHP / (damage * mult)) * (60 / rof)
+  });
+
   const close = calc(dmg.closeDamage), far = calc(dmg.farDamage);
   const closeHS = calc(dmg.closeDamage, hsMult), farHS = calc(dmg.farDamage, hsMult);
+
   return {
     effectiveHP: effHP.toFixed(1),
     closeDPS: close.dps.toFixed(1), farDPS: far.dps.toFixed(1),
@@ -305,10 +324,12 @@ function calculateMetrics(weapon, bulletResist, targetHP, selectorOverride) {
     closeTTK: close.ttk.toFixed(3), farTTK: far.ttk.toFixed(3),
     closeHeadshotTTK: closeHS.ttk.toFixed(3), farHeadshotTTK: farHS.ttk.toFixed(3),
     armorPiercing: (ap * 100).toFixed(1) + '%',
-    closeDamage: dmg.closeDamage, farDamage: dmg.farDamage,
-    maxDistance: dmg.maxDistance, rateOfFire: rof,
+    closeDamage: Math.round(dmg.closeDamage), 
+    farDamage: Math.round(dmg.farDamage),
+    maxDistance: Math.round(dmg.maxDistance), 
+    rateOfFire: Math.round(rof),
     damageDrop: dmg.maxDistance ? ((1 - dmg.farDamage / dmg.closeDamage) * 100).toFixed(1) + '%' : '0%',
-    headshotMultiplier: hsMult,
+    headshotMultiplier: hsMult.toFixed(2),
   };
 }
 
@@ -496,10 +517,13 @@ function updateDetailedChart() {
 }
 
 function calculateWeaponData(weapon, distances) {
-  const damageStats = extractDamageStats(weapon.xaract);
-  const rof = extractRateOfFire(weapon.xaract);
-  const headshotMultiplier = extractHeadshotMultiplier(weapon.xaract);
-  
+  const selector = selectedItems.selector1 === weapon ? 'selector1' : 'selector2';
+  const enhanced = applyEnhancement(weapon, selector);
+
+  const damageStats = enhanced._enhancedDamage || extractDamageStats(enhanced.xaract);
+  const rof = enhanced._enhancedRof || extractRateOfFire(enhanced.xaract);
+  const headshotMultiplier = extractHeadshotMultiplier(enhanced.xaract);
+
   let hitMultiplier = 1.0;
   if (currentHitType === 'headshot') hitMultiplier = headshotMultiplier;
   else if (currentHitType === 'limbshot') hitMultiplier = 0.8;
@@ -507,14 +531,13 @@ function calculateWeaponData(weapon, distances) {
   const targetHP = parseFloat(document.getElementById('target-hp')?.value) || 132;
   const bulletResist = parseFloat(document.getElementById('bullet-resist')?.value) || 250;
 
-  const selector = selectedItems.selector1 === weapon ? 'selector1' : 'selector2';
   const armorPiercing = customArmorPiercing[selector] !== null
     ? customArmorPiercing[selector]
     : (damageStats.armorPiercing || 0);
 
   return distances.map(distance => {
-    const damage = calculateDamageAtDistance(weapon, distance) * hitMultiplier;
-    
+    const damage = calculateDamageAtDistance(enhanced, distance) * hitMultiplier;
+
     if (currentMetric === 'dps') {
       return Math.round((damage * rof / 60) * 100) / 100;
     } else {
@@ -794,15 +817,40 @@ function compareItems() {
   if (!selectedItems.selector1 || !selectedItems.selector2 || !resultContainer) return;
   
   resultContainer.innerHTML = '';
+
+  // применяем заточку
+  const w1 = applyEnhancement(selectedItems.selector1, 'selector1');
+  const w2 = applyEnhancement(selectedItems.selector2, 'selector2');
+
+  // функция для модификации xaract, не ломая остальные параметры
+  function getEnhancedXaract(w, origXaract) {
+  if (!w._enhancedDamage && !w._enhancedRof) return origXaract;
+  const lines = origXaract.split('\n').map(l => l.trim());
+
+  return lines.map(line => {
+    if (line.startsWith("Урон")) {
+      const dmg = w._enhancedDamage;
+      return `Урон: ${Math.round(dmg.closeDamage)} | ${Math.round(dmg.maxDistance)}м - ${Math.round(dmg.farDamage)} | ${Math.round(dmg.maxDistance)}м`;
+    }
+    if (line.startsWith("Скорострельность") && w._enhancedRof) {
+      return `Скорострельность: ${Math.round(w._enhancedRof)} выстрелов/мин`;
+    }
+    return line; // все остальные строки без изменений
+  }).join('\n');
+}
+
+  const w1Xaract = getEnhancedXaract(w1, w1.xaract);
+  const w2Xaract = getEnhancedXaract(w2, w2.xaract);
+
   const s1 = { 
-    ...parseStats(selectedItems.selector1.xaract), 
-    ...parseStats(selectedItems.selector1.blueStat) 
+    ...parseStats(w1Xaract), 
+    ...parseStats(w1.blueStat) 
   };
   const s2 = { 
-    ...parseStats(selectedItems.selector2.xaract), 
-    ...parseStats(selectedItems.selector2.blueStat) 
+    ...parseStats(w2Xaract), 
+    ...parseStats(w2.blueStat) 
   };
-  
+
   const allKeys = [...new Set([...Object.keys(s1), ...Object.keys(s2)])];
   
   allKeys.forEach(key => {
@@ -811,7 +859,6 @@ function compareItems() {
     let class1 = 'equal', class2 = 'equal';
     
     if (v1 !== null && v2 !== null) {
-      // Инвертированное сравнение для определенных параметров
       const isInverted = invertedStats.has(key);
       
       if ((!isInverted && v1 > v2) || (isInverted && v1 < v2)) {
