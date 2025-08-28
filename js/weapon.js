@@ -11,9 +11,18 @@ async function loadWeapon() {
 }
 
 async function displayWeapon() {
-    const weaponList = await loadWeapon();
-    const grid = document.getElementById('weaponGrid');
+    let weaponList = await loadWeapon();
 
+    // Парсим уровень снаряжения из поля xaract
+    weaponList.forEach(w => {
+        const match = w.xaract.match(/Уровень снаряжения:\s*(\d+)/);
+        w.equipLevel = match ? parseInt(match[1], 10) : 0;
+    });
+
+    // Сортировка по уровню (от большего к меньшему)
+    weaponList.sort((a, b) => b.equipLevel - a.equipLevel);
+
+    const grid = document.getElementById('weaponGrid');
     if (!grid) return;
 
     grid.innerHTML = weaponList.map(weapon => `
@@ -27,7 +36,7 @@ async function displayWeapon() {
           <img src="${weapon.image}" alt="${weapon.name}" class="weapon-image">
           <div class="weapon-name">${weapon.name}</div>
       </div>
-  `).join('');
+    `).join('');
 
     initEventHandlers();
 }

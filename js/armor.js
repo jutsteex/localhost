@@ -11,9 +11,18 @@ async function loadArmor() {
 }
 
 async function displayArmor() {
-    const armorList = await loadArmor();
-    const grid = document.getElementById('armorGrid');
+    let armorList = await loadArmor();
 
+    // Извлекаем уровень снаряжения из xaract
+    armorList.forEach(a => {
+        const match = a.xaract.match(/Уровень снаряжения:\s*(\d+)/);
+        a.equipLevel = match ? parseInt(match[1], 10) : 0;
+    });
+
+    // Сортировка по уровню (от большего к меньшему)
+    armorList.sort((a, b) => b.equipLevel - a.equipLevel);
+
+    const grid = document.getElementById('armorGrid');
     if (!grid) return;
 
     grid.innerHTML = armorList.map(armor => `
