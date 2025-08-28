@@ -71,9 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Удаляем активный класс у всех кнопок
                 filterButtons.forEach(btn => btn.classList.remove('active'));
-                // Добавляем активный класс текущей кнопке
                 button.classList.add('active');
 
                 const filter = button.dataset.filter;
@@ -92,7 +90,78 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Открытие модального окна
+    // === Лайтбокс для полноэкранного зума ===
+    const imageZoomOverlay = document.createElement('div');
+    imageZoomOverlay.id = 'imageZoomOverlay';
+    imageZoomOverlay.innerHTML = `
+      <div class="image-zoom-container">
+        <button class="image-zoom-prev" aria-label="Предыдущее">‹</button>
+        <img class="image-zoom-img" alt="">
+        <button class="image-zoom-next" aria-label="Следующее">›</button>
+      </div>
+    `;
+    document.body.appendChild(imageZoomOverlay);
+
+    const zoomImg = imageZoomOverlay.querySelector('.image-zoom-img');
+    const zoomPrev = imageZoomOverlay.querySelector('.image-zoom-prev');
+    const zoomNext = imageZoomOverlay.querySelector('.image-zoom-next');
+
+    let currentImages = [];
+    let currentIndex = 0;
+
+    function openImageZoom(images, startIndex = 0) {
+        currentImages = images;
+        currentIndex = startIndex;
+        showZoomImage();
+        imageZoomOverlay.classList.add('active');
+    }
+
+    function showZoomImage() {
+        if (!currentImages.length) return;
+
+        const { src, alt } = currentImages[currentIndex];
+        zoomImg.classList.remove('fade-in');
+        void zoomImg.offsetWidth; // триггер перерисовки для анимации
+
+        zoomImg.alt = alt || '';
+        zoomImg.src = src;
+
+        zoomPrev.style.display = currentImages.length > 1 ? 'block' : 'none';
+        zoomNext.style.display = currentImages.length > 1 ? 'block' : 'none';
+
+        zoomImg.onload = () => {
+            zoomImg.classList.add('fade-in');
+        };
+    }
+
+    function closeImageZoom() {
+        imageZoomOverlay.classList.remove('active');
+        currentImages = [];
+        currentIndex = 0;
+    }
+
+    function showPrevImage() {
+        if (!currentImages.length) return;
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        showZoomImage();
+    }
+
+    function showNextImage() {
+        if (!currentImages.length) return;
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        showZoomImage();
+    }
+
+    zoomPrev.addEventListener('click', showPrevImage);
+    zoomNext.addEventListener('click', showNextImage);
+
+    imageZoomOverlay.addEventListener('click', (e) => {
+        if (!e.target.closest('.image-zoom-container')) {
+            closeImageZoom();
+        }
+    });
+
+    // === Открытие модального окна ===
     function openModal(article) {
         modalContainer.innerHTML = `
             <div class="modal-image-container">
@@ -105,20 +174,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
         modalOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-
-        // Прокрутка в начало модального окна
         modalContainer.scrollTo(0, 0);
+
+        const images = [...modalContainer.querySelectorAll('img')].map(img => ({
+            src: img.src,
+            alt: img.alt || article.title
+        }));
+
+        modalContainer.querySelectorAll('img').forEach((img, idx) => {
+            img.style.cursor = 'zoom-in';
+            img.addEventListener('click', () => openImageZoom(images, idx));
+        });
     }
 
-    // Закрытие модального окна по клику вне контейнера
     modalOverlay.addEventListener('click', function(e) {
         if (e.target === modalOverlay) {
             closeModal();
         }
     });
 
-    // Закрытие модального окна по ESC
     document.addEventListener('keydown', function(e) {
+        if (imageZoomOverlay.classList.contains('active')) {
+            if (e.key === 'Escape') closeImageZoom();
+            else if (e.key === 'ArrowLeft') showPrevImage();
+            else if (e.key === 'ArrowRight') showNextImage();
+            return;
+        }
+
         if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
             closeModal();
         }
@@ -129,17 +211,35 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = 'auto';
     }
 
-    // Обработка ошибок загрузки изображений
     document.addEventListener('error', function(e) {
-        if (e.target.tagName === 'IMG') {
-            e.target.style.display = 'none';
-            const container = e.target.closest('.modal-image-container, .card-image-container');
-            if (container) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'image-error';
-                errorDiv.textContent = 'Изображение не загружено';
-                container.appendChild(errorDiv);
-            }
+        if (e.target.tagName !== 'IMG') return;
+
+        const img = e.target;
+        if (!img.getAttribute('src') || img.dataset.skipError === 'true') return;
+
+        const container = img.closest('.modal-image-container, .card-image-container, .image-zoom-container');
+        if (!container) return;
+
+        if (!container.querySelector('.image-error')) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'image-error';
+            errorDiv.textContent = 'Изображение не загружено';
+            container.appendChild(errorDiv);
+        }
+
+        img.style.display = 'none';
+    }, true);
+
+    document.addEventListener('load', function(e) {
+        if (e.target.tagName !== 'IMG') return;
+
+        const img = e.target;
+        img.style.display = '';
+
+        const container = img.closest('.modal-image-container, .card-image-container, .image-zoom-container');
+        if (container) {
+            const err = container.querySelector('.image-error');
+            if (err) err.remove();
         }
     }, true);
 });
