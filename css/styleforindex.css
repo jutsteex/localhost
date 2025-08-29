@@ -24,14 +24,9 @@ html, body {
 
 body {
     font-family: 'Manrope', sans-serif;
-    background: url("../image/grunge-background.png") center / cover no-repeat,
-	linear-gradient(#24211f, rgba(36, 33, 31, 22)) fixed;
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-blend-mode: overlay; /* или darken/overlay для эффекта */
+    background-color: #24211f;
     color: #fff;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 /* Стили для скроллбара */
