@@ -651,6 +651,7 @@ nav {
   box-shadow: 0 10px 24px rgba(0,0,0,.35);
   cursor: pointer;
   transition: transform .25s ease, box-shadow .25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .promo-card:hover{
   transform: scale(1.05);
