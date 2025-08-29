@@ -265,8 +265,8 @@
 }
 
 .modal-container {
-  width: min(900px, 100%);
-  max-height: 90vh;
+  width: min(1000px, 100%);
+  max-height: 98vh;
   overflow: auto;
   background: #111;
   color: #eee;

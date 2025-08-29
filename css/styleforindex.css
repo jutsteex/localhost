@@ -723,17 +723,75 @@ nav {
 }
 .modal-overlay.active{ display:flex; }
 
-.modal-container{
-  width:min(900px,100%); max-height:90vh; overflow:auto;
-  background:#111; color:#eee; border-radius:16px; padding:20px;
-  box-shadow:0 20px 40px rgba(0,0,0,.5);
-   font-family: 'Manrope', sans-serif; /* Добавлено */;
+.modal-container {
+  width: min(1100px, 100%);
+  max-height: 98vh;
+  overflow: auto;
+  background: #111;
+  color: #eee;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.5);
 }
-.modal-image-container img{ width:100%; height:auto; border-radius:12px; display:block; }
-.modal-date{ opacity:.75; font-size:14px; margin-top:10px; 
- font-family: 'Manrope', sans-serif; }/* Добавлено */
-.modal-title{ font-size:16px; margin:8px 0 12px; font-family: 'Oswald', sans-serif; }
-.modal-content img{ max-width:100%; height:auto; border-radius:8px; }
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #FFF19B;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.modal-image-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+}
+
+.modal-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.modal-date {
+  opacity: .75;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.modal-title {
+  font-size: 24px;
+  margin: 8px 0 12px;
+}
+
+.modal-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.modal-content h3 {
+    color: #FFF19B;
+    margin: 25px 0 15px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.4rem;
+}
+
+.modal-content ul {
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.modal-content li {
+    margin-bottom: 8px;
+}
 
 /* === Лайтбокс (зум) === */
 #imageZoomOverlay{
