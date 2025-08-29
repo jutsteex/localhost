@@ -20,7 +20,7 @@
 body {
     font-family: 'Manrope', sans-serif;
     background-color: #24211f; /* цвет фона */
-    background-image: url('../image/grunge-background.png');
+    background-image: url('../image/grunge-background.png');;
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay; /* экспериментируйте с режимами */
