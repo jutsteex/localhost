@@ -49,13 +49,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Автопереключение слайдов
     function startInterval() {
-        slideInterval = setInterval(nextSlide, 3500);
+    clearInterval(slideInterval);           // очищаем на всякий случай
+    slideInterval = setInterval(nextSlide, 3500);
     }
     
     function resetInterval() {
-        clearInterval(slideInterval);
-        startInterval();
-    }
+    startInterval(); // внутри уже есть clearInterval
+}
     
     startInterval();
     

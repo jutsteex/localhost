@@ -49,18 +49,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const articleCard = document.createElement('div');
             articleCard.className = `news-card ${articleType}`;
+            articleCard.style.backgroundImage = article.image ? `url(${article.image})` : 'none';
+
             articleCard.innerHTML = `
-                <div class="card-image-container">
-                    <img src="${article.image}" alt="${article.title}" class="card-image" loading="lazy">
-                </div>
                 <div class="card-content">
                     <div class="card-date">${article.date}</div>
                     <h3 class="card-title">${article.title}</h3>
-                    <p class="card-description">${article.shortDescription}</p>
+                    <button class="card-btn">Подробнее</button>
                 </div>
             `;
 
+            // открытие по клику на карточку
             articleCard.addEventListener('click', () => openModal(article));
+
+            // открытие по кнопке
+            articleCard.querySelector('.card-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openModal(article);
+            });
+
             newsGrid.appendChild(articleCard);
         });
     }
@@ -120,17 +127,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!currentImages.length) return;
 
         const { src, alt } = currentImages[currentIndex];
-        zoomImg.classList.remove('fade-in');
-        void zoomImg.offsetWidth; // триггер перерисовки для анимации
-
         zoomImg.alt = alt || '';
         zoomImg.src = src;
 
         zoomPrev.style.display = currentImages.length > 1 ? 'block' : 'none';
         zoomNext.style.display = currentImages.length > 1 ? 'block' : 'none';
 
+        // локальная обработка ошибок/загрузки
+        zoomImg.onerror = () => {
+            zoomImg.style.visibility = 'hidden';
+            if (!zoomImg.parentNode.querySelector('.image-error')) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'image-error';
+                errorDiv.textContent = 'Изображение не загружено';
+                zoomImg.parentNode.appendChild(errorDiv);
+            }
+        };
         zoomImg.onload = () => {
-            zoomImg.classList.add('fade-in');
+            zoomImg.style.visibility = 'visible';
+            const err = zoomImg.parentNode.querySelector('.image-error');
+            if (err) err.remove();
         };
     }
 
@@ -184,6 +200,22 @@ document.addEventListener('DOMContentLoaded', function() {
         modalContainer.querySelectorAll('img').forEach((img, idx) => {
             img.style.cursor = 'zoom-in';
             img.addEventListener('click', () => openImageZoom(images, idx));
+
+            // локальные обработчики ошибок / загрузки
+            img.onerror = () => {
+                img.style.visibility = 'hidden';
+                if (!img.parentNode.querySelector('.image-error')) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'image-error';
+                    errorDiv.textContent = 'Изображение не загружено';
+                    img.parentNode.appendChild(errorDiv);
+                }
+            };
+            img.onload = () => {
+                img.style.visibility = 'visible';
+                const err = img.parentNode.querySelector('.image-error');
+                if (err) err.remove();
+            };
         });
     }
 
@@ -210,36 +242,4 @@ document.addEventListener('DOMContentLoaded', function() {
         modalOverlay.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
-
-    document.addEventListener('error', function(e) {
-        if (e.target.tagName !== 'IMG') return;
-
-        const img = e.target;
-        if (!img.getAttribute('src') || img.dataset.skipError === 'true') return;
-
-        const container = img.closest('.modal-image-container, .card-image-container, .image-zoom-container');
-        if (!container) return;
-
-        if (!container.querySelector('.image-error')) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'image-error';
-            errorDiv.textContent = 'Изображение не загружено';
-            container.appendChild(errorDiv);
-        }
-
-        img.style.display = 'none';
-    }, true);
-
-    document.addEventListener('load', function(e) {
-        if (e.target.tagName !== 'IMG') return;
-
-        const img = e.target;
-        img.style.display = '';
-
-        const container = img.closest('.modal-image-container, .card-image-container, .image-zoom-container');
-        if (container) {
-            const err = container.querySelector('.image-error');
-            if (err) err.remove();
-        }
-    }, true);
 });
