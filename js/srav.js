@@ -301,35 +301,58 @@ function getTotalArmorPiercing(weapon) {
   return extraAP + ammoAP;
 }
 
-function calculateMetrics(weapon, bulletResist, targetHP, selectorOverride) {
-  const dmg = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
-  const rof = weapon._enhancedRof || extractRateOfFire(weapon.xaract);
-  const hsMult = extractHeadshotMultiplier(weapon.xaract);
-  const selector = selectorOverride || (selectedItems.selector1 === weapon ? 'selector1' : 'selector2');
-  const ap = getTotalArmorPiercing(weapon);
+// Универсальный расчёт урона/TTK/DPS
 
+function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType = 'bodyshot') {
+  const selector = selectedItems.selector1 === weapon ? 'selector1' : 'selector2';
+  const enhanced = applyEnhancement(weapon, selector);
+
+  const dmgStats = enhanced._enhancedDamage || extractDamageStats(enhanced.xaract);
+  const rof = enhanced._enhancedRof || extractRateOfFire(enhanced.xaract);
+  const hsMult = extractHeadshotMultiplier(enhanced.xaract);
+
+  let hitMult = 1.0;
+  if (hitType === 'headshot') hitMult = hsMult;
+  else if (hitType === 'limbshot') hitMult = 0.8;
+
+  const ap = getTotalArmorPiercing(enhanced);
   const effHP = ((bulletResist - (bulletResist * ap)) + 100) * (targetHP / 100);
-  const calc = (damage, mult = 1) => ({
-    dps: (damage * rof / 60) * mult,
-    ttk: (effHP / (damage * mult)) * (60 / rof)
-  });
 
-  const close = calc(dmg.closeDamage), far = calc(dmg.farDamage);
-  const closeHS = calc(dmg.closeDamage, hsMult), farHS = calc(dmg.farDamage, hsMult);
+  const damage = calculateDamageAtDistance(enhanced, distance) * hitMult;
 
   return {
-    effectiveHP: effHP.toFixed(1),
-    closeDPS: close.dps.toFixed(1), farDPS: far.dps.toFixed(1),
-    closeHeadshotDPS: closeHS.dps.toFixed(1), farHeadshotDPS: farHS.dps.toFixed(1),
-    closeTTK: close.ttk.toFixed(3), farTTK: far.ttk.toFixed(3),
-    closeHeadshotTTK: closeHS.ttk.toFixed(3), farHeadshotTTK: farHS.ttk.toFixed(3),
-    armorPiercing: (ap * 100).toFixed(1) + '%',
-    closeDamage: Math.round(dmg.closeDamage), 
-    farDamage: Math.round(dmg.farDamage),
-    maxDistance: Math.round(dmg.maxDistance), 
-    rateOfFire: Math.round(rof),
-    damageDrop: dmg.maxDistance ? ((1 - dmg.farDamage / dmg.closeDamage) * 100).toFixed(1) + '%' : '0%',
-    headshotMultiplier: hsMult.toFixed(2),
+    dps: (damage * rof / 60),
+    ttk: (effHP / damage) * (60 / rof),
+    damage,
+    rof,
+    ap,
+    hsMult
+  };
+}
+
+function calculateMetrics(weapon, bulletResist, targetHP, selectorOverride) {
+  const close    = calcWeaponAtDistance(weapon, 0, bulletResist, targetHP, 'bodyshot');
+  const far      = calcWeaponAtDistance(weapon, 50, bulletResist, targetHP, 'bodyshot');
+  const closeHS  = calcWeaponAtDistance(weapon, 0, bulletResist, targetHP, 'headshot');
+  const farHS    = calcWeaponAtDistance(weapon, 50, bulletResist, targetHP, 'headshot');
+
+  return {
+    effectiveHP: ((targetHP * (bulletResist / 100))).toFixed(1),
+    closeDPS: close.dps.toFixed(1),
+    farDPS: far.dps.toFixed(1),
+    closeHeadshotDPS: closeHS.dps.toFixed(1),
+    farHeadshotDPS: farHS.dps.toFixed(1),
+    closeTTK: close.ttk.toFixed(3),
+    farTTK: far.ttk.toFixed(3),
+    closeHeadshotTTK: closeHS.ttk.toFixed(3),
+    farHeadshotTTK: farHS.ttk.toFixed(3),
+    armorPiercing: (close.ap * 100).toFixed(1) + '%',
+    closeDamage: Math.round(close.damage),
+    farDamage: Math.round(far.damage),
+    maxDistance: 50,
+    rateOfFire: Math.round(close.rof),
+    damageDrop: ((1 - far.damage / close.damage) * 100).toFixed(1) + '%',
+    headshotMultiplier: close.hsMult.toFixed(2),
   };
 }
 
@@ -516,34 +539,18 @@ function updateDetailedChart() {
   }
 }
 
+// ===============================
+// Данные для графика
+// ===============================
 function calculateWeaponData(weapon, distances) {
-  const selector = selectedItems.selector1 === weapon ? 'selector1' : 'selector2';
-  const enhanced = applyEnhancement(weapon, selector);
-
-  const damageStats = enhanced._enhancedDamage || extractDamageStats(enhanced.xaract);
-  const rof = enhanced._enhancedRof || extractRateOfFire(enhanced.xaract);
-  const headshotMultiplier = extractHeadshotMultiplier(enhanced.xaract);
-
-  let hitMultiplier = 1.0;
-  if (currentHitType === 'headshot') hitMultiplier = headshotMultiplier;
-  else if (currentHitType === 'limbshot') hitMultiplier = 0.8;
-
   const targetHP = parseFloat(document.getElementById('target-hp')?.value) || 132;
   const bulletResist = parseFloat(document.getElementById('bullet-resist')?.value) || 250;
 
-  const armorPiercing = customArmorPiercing[selector] !== null
-    ? customArmorPiercing[selector]
-    : (damageStats.armorPiercing || 0);
-
   return distances.map(distance => {
-    const damage = calculateDamageAtDistance(enhanced, distance) * hitMultiplier;
-
-    if (currentMetric === 'dps') {
-      return Math.round((damage * rof / 60) * 100) / 100;
-    } else {
-      const effectiveHP = ((bulletResist - (bulletResist * armorPiercing)) + 100) * (targetHP / 100);
-      return Math.round((effectiveHP / damage) * (60 / rof) * 1000) / 1000;
-    }
+    const data = calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, currentHitType);
+    return currentMetric === 'dps'
+      ? Math.round(data.dps * 100) / 100
+      : Math.round(data.ttk * 1000) / 1000;
   });
 }
 
