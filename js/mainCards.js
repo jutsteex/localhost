@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   cards.forEach(article => {
     const el = document.createElement('div');
     el.className = 'promo-card';
-    el.style.backgroundImage = article.image ? `url(${article.image})` : 'none';
+    el.style.backgroundImage = article.backimage ? `url(${article.backimage})` : 'none';
 
     el.innerHTML = `
       <div class="promo-overlay"></div>

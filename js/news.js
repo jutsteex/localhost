@@ -36,41 +36,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Рендер карточек статей
     function renderArticles(articles) {
-        if (!articles || articles.length === 0) {
-            newsGrid.innerHTML = '<p class="no-articles">Статьи не найдены</p>';
-            return;
-        }
-
-        newsGrid.innerHTML = '';
-
-        articles.forEach(article => {
-            const isGuide = article.title.toLowerCase().includes('гайд');
-            const articleType = isGuide ? 'guide' : 'article';
-
-            const articleCard = document.createElement('div');
-            articleCard.className = `news-card ${articleType}`;
-            articleCard.style.backgroundImage = article.image ? `url(${article.image})` : 'none';
-
-            articleCard.innerHTML = `
-                <div class="card-content">
-                    <div class="card-date">${article.date}</div>
-                    <h3 class="card-title">${article.title}</h3>
-                    <button class="card-btn">Подробнее</button>
-                </div>
-            `;
-
-            // открытие по клику на карточку
-            articleCard.addEventListener('click', () => openModal(article));
-
-            // открытие по кнопке
-            articleCard.querySelector('.card-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                openModal(article);
-            });
-
-            newsGrid.appendChild(articleCard);
-        });
+    if (!articles || articles.length === 0) {
+        newsGrid.innerHTML = '<p class="no-articles">Статьи не найдены</p>';
+        return;
     }
+
+    newsGrid.innerHTML = '';
+
+    articles.forEach(article => {
+        const isGuide = article.title.toLowerCase().includes('гайд');
+        const articleType = isGuide ? 'guide' : 'article';
+
+        const articleCard = document.createElement('div');
+        articleCard.className = `news-card ${articleType}`;
+        articleCard.style.backgroundImage = article.backimage ? `url(${article.backimage})` : 'none';
+
+        articleCard.innerHTML = `
+            <div class="card-content">
+                <div class="card-date">${article.date}</div>
+                <h3 class="card-title">${article.title}</h3>
+                <button class="card-btn">Подробнее</button>
+            </div>
+        `;
+
+        // открытие по клику на карточку
+        articleCard.addEventListener('click', () => openModal(article));
+
+        // открытие по кнопке
+        articleCard.querySelector('.card-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openModal(article);
+        });
+
+        newsGrid.appendChild(articleCard);
+    });
+}
 
     // Настройка кнопок фильтра
     function setupFilterButtons() {
