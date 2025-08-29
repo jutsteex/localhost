@@ -17,13 +17,19 @@
     box-sizing: border-box;
 }
 
+/* общий фон для всей страницы */
+html, body {
+    height: 100%;
+}
+
 body {
     font-family: 'Manrope', sans-serif;
-    background-color: #24211f; /* цвет фона */
-    background-image: url('../image/grunge-background.png');;
+    background-color: #24211f; /* базовый тёмный */
+    background-image: url('../image/grunge-background.png');
     background-size: cover;
-    background-position: center;
-    background-blend-mode: overlay; /* экспериментируйте с режимами */
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-blend-mode: overlay; /* или darken/overlay для эффекта */
     color: #fff;
     line-height: 1.6;
 }
@@ -249,7 +255,7 @@ nav {
 }
 
 .carousel-slide:nth-child(1) {
-    background-image: url('../image/back1.png');
+    background-image: url('../image/back2.png');
 }
 
 .carousel-slide:nth-child(2) {
@@ -443,12 +449,7 @@ nav {
 
 /* Современный футер */
 .modern-footer {
-    background: linear-gradient(to bottom, #2a2725, #1a1817);
-    background-color: #24211f; /* цвет фона */
-    background-image: url('../image/grunge-background.png');
-    background-size: cover;
-    background-position: center;
-    background-blend-mode: overlay; /* экспериментируйте с режимами */
+    background: transparent; /* фон убрали */
     color: #fff;
     padding: 60px 5% 30px;
     position: relative;
