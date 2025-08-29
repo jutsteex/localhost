@@ -81,42 +81,10 @@
                 <p>Выберите интересующие вас статьи...</p>
             </div>
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-map-marked-alt"></i>
-                    </div>
-                    <h3>-</h3>
-                    <p>-</p>
-                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <h3>-</h3>
-                    <p>-</p>
-                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <h3>-</h3>
-                    <p>-</p>
-                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-newspaper"></i>
-                    </div>
-                    <h3>-</h3>
-                    <p>-</p>
-                    <a href="#" class="feature-link">Перейти <i class="fas fa-arrow-right"></i></a>
-                </div>
+            <div class="promo-grid" id="mainCardsGrid"></div>
+            <!-- Модалка для карточек главной -->
+             <div id="modalOverlay" class="modal-overlay">
+                <div id="modalContainer" class="modal-container"></div>
             </div>
         </section>
     </main>
@@ -167,6 +135,8 @@
             </div>
         </div>
     </footer>
+    
+    <script src="./js/mainCards.js"></script>
 
     <script src="./js/script1.js"></script>
 </body>

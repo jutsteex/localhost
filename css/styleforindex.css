@@ -633,3 +633,130 @@ nav {
         justify-content: center;
     }
 }
+/* === Главная: квадратные промо-карточки === */
+.promo-grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:16px;
+}
+
+.promo-card{
+  position:relative;
+  width:256px;
+  height:256px;
+  border-radius:8px;
+  overflow:hidden;
+  background:#111 center/cover no-repeat;
+  box-shadow:0 10px 24px rgba(0,0,0,.35);
+  cursor:pointer;
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+.promo-card:hover{
+  transform:scale(1.05);               /* подпрыгивает */
+  box-shadow:0 18px 32px rgba(0,0,0,.45);
+}
+
+.promo-overlay{
+  position:absolute; inset:0;
+  /* мягкий затемняющий градиент как на макете */
+  background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.85) 100%);
+}
+
+.promo-inner{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:12px; z-index:1;
+}
+
+.promo-badges{
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+  font-size:12px; line-height:1; user-select:none;
+}
+.promo-tag{
+  color:#fff; background:rgba(255,255,255,.12);
+  padding:6px 10px; border-radius:10px; backdrop-filter:blur(2px);
+}
+.promo-date{
+  color:#e6e6e6; background:rgba(0,0,0,.35);
+  padding:6px 10px; border-radius:10px;
+}
+
+.promo-title{
+  color:#fff;                          /* по умолчанию белый */
+  font-weight:800;
+  font-size:clamp(16px,2.3vw,20px);
+  line-height:1.2;
+  text-shadow:0 2px 4px rgba(0,0,0,.6);
+  max-width:92%;
+  transition:color .2s ease;           /* плавная смена цвета */
+}
+.promo-card:hover .promo-title{
+  color:#ffd84d;                       /* при наведении жёлтый */
+}
+
+.promo-btn{
+  width:100%;
+  border:none;
+  border-radius:8px;
+  padding:12px 14px;
+  background:#fff;
+  color:#222;
+  font-weight:700;
+  box-shadow:0 6px 12px rgba(0,0,0,.25);
+  opacity:0;                           /* скрыта */
+  transform:translateY(10px);
+  transition:opacity .25s ease, transform .25s ease;
+}
+.promo-card:hover .promo-btn{
+  opacity:1;                           /* появляется */
+  transform:translateY(0);
+}
+
+/* === Модальное окно === */
+.modal-overlay{
+  position:fixed; inset:0;
+  display:none; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.6);
+  padding:24px; z-index:1000;
+}
+.modal-overlay.active{ display:flex; }
+
+.modal-container{
+  width:min(900px,100%); max-height:90vh; overflow:auto;
+  background:#111; color:#eee; border-radius:16px; padding:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,.5);
+}
+.modal-image-container img{ width:100%; height:auto; border-radius:12px; display:block; }
+.modal-date{ opacity:.75; font-size:14px; margin-top:10px; }
+.modal-title{ font-size:16px; margin:8px 0 12px; font-family: "Segoe UI", Arial, sans-serif; }
+.modal-content img{ max-width:100%; height:auto; border-radius:8px; }
+
+/* === Лайтбокс (зум) === */
+#imageZoomOverlay{
+  position:fixed; inset:0; display:none;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.92); z-index:1100; padding:24px;
+}
+#imageZoomOverlay.active{ display:flex; }
+
+.image-zoom-container{ position:relative; max-width:95vw; max-height:95vh; }
+.image-zoom-img{ max-width:100%; max-height:95vh; border-radius:8px; }
+.image-zoom-prev, .image-zoom-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:44px; height:44px; border:none; border-radius:12px;
+  background:rgba(255,255,255,.14); color:#fff; font-size:26px; cursor:pointer;
+}
+.image-zoom-prev{ left:-56px; } .image-zoom-next{ right:-56px; }
+
+.fade-in{ animation:fade-in .2s ease; }
+@keyframes fade-in{ from{opacity:0} to{opacity:1} }
+
+.image-error{
+  position:absolute; inset:auto 12px 12px 12px;
+  background:rgba(0,0,0,.6); color:#fff; padding:8px 10px; border-radius:10px;
+  font-size:14px;
+}
+
+/* Немного подправим отступы секции, чтобы карточки «дышали» */
+.features-section .section-header{ margin-bottom:16px; }
