@@ -733,7 +733,7 @@ nav {
   width:min(900px,100%); max-height:90vh; overflow:auto;
   background:#111; color:#eee; border-radius:16px; padding:20px;
   box-shadow:0 20px 40px rgba(0,0,0,.5);
-   font-family: 'Manrope', sans-serif; /* Добавлено */
+   font-family: 'Manrope', sans-serif; /* Добавлено */;
 }
 .modal-image-container img{ width:100%; height:auto; border-radius:12px; display:block; }
 .modal-date{ opacity:.75; font-size:14px; margin-top:10px; 
