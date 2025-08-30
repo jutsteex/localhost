@@ -138,6 +138,7 @@ nav {
 }
 
 /* Выпадающее меню */
+
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -153,8 +154,9 @@ nav {
     transform: translateY(10px);
     opacity: 0;
     transition: all 0.4s ease;
-    border: 1px solid #FFF19B;
+    border: 1px solid #727272; 
 }
+
 
 .dropdown-menu li {
     width: 100%;
