@@ -63,6 +63,23 @@ function initEventHandlers() {
             }
         });
     });
+    // Поиск по названию
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const allCards = document.querySelectorAll('.artifact-card, .armor-card, .weapon-card');
+        allCards.forEach(card => {
+            const name = card.dataset.name.toLowerCase();
+            if (name.includes(query)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+}
+
 
     // Модальное окно
     const modal = document.getElementById('armorModal');

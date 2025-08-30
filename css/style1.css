@@ -72,7 +72,7 @@ nav {
     padding: 0 5%;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     width: 100%;
-    border-bottom: 2px solid #FFF19B;
+    border-bottom: 2px solid rgba(71,65,61, 0.4);
 }
 
 .navbar {
@@ -540,7 +540,7 @@ nav {
     padding: 60px 5% 30px;
     position: relative;
     overflow: hidden;
-    border-top: 2px solid #FFF19B;
+    border-top: 2px solid rgba(71,65,61, 0.4);
 }
 
 .footer-content {
@@ -858,4 +858,35 @@ nav {
     .weapon-image {
         max-width: 90px;
     }
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    padding: 8px 16px;
+    font-size: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    outline: none;
+    width: 400px;
+    text-align: center;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    transition: all 0.25s ease;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#searchInput:focus {
+    background: rgba(255, 241, 155, 0.9);
+    color: #000000;
+    border-color: #FFF19B;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
