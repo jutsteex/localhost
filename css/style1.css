@@ -39,7 +39,7 @@ body::before {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed; /* Ключевое свойство */
-    opacity: 0.8;
+    opacity: 1;
     z-index: 9999;
     pointer-events: none;
     mix-blend-mode: overlay;
