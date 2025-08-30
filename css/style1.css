@@ -20,13 +20,29 @@
 
 body {
     font-family: 'Manrope', sans-serif;
-    background-color: #24211f; /* цвет фона */
-    background-image: url('../image/grunge-background.png');;
+    background-color: #24211f;
+    color: #fff;
+    line-height: 1.5;
+    position: relative;
+}
+
+/* Гранжевый фон для всей страницы (фиксированный но не двигается) */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../image/grunge-background.png');
     background-size: cover;
     background-position: center;
-    background-blend-mode: overlay; /* экспериментируйте с режимами */
-    color: #fff;
-    line-height: 1.6;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Ключевое свойство */
+    opacity: 0.8;
+    z-index: 9999;
+    pointer-events: none;
+    mix-blend-mode: overlay;
 }
 
 /* Стили для скроллбара */
@@ -530,9 +546,7 @@ nav {
 
 /* Современный футер */
 .modern-footer {
-    background: linear-gradient(to bottom, #2a2725, #1a1817);
     background-color: #24211f; /* цвет фона */
-    background-image: url('../image/grunge-background.png');
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay; /* экспериментируйте с режимами */
