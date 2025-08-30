@@ -119,6 +119,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+
+    if (!query) {
+      filteredArticles = allArticles.slice();
+    } else {
+      filteredArticles = allArticles.filter(article =>
+        (article.title || '').toLowerCase().includes(query)
+      );
+    }
+
+    filteredArticles = sortArticlesByDateDesc(filteredArticles);
+    renderArticles(filteredArticles);
+  });
+}
+
   // ====== Лайтбокс (зум картинок) ======
   const imageZoomOverlay = document.createElement('div');
   imageZoomOverlay.id = 'imageZoomOverlay';
