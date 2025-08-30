@@ -27,6 +27,25 @@ body {
     background-color: #24211f;
     color: #fff;
     line-height: 1.5;
+    position: relative;
+}
+
+/* Гранжевый фон для всей страницы */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../image/grunge-background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.6; /* Регулируйте прозрачность по вкусу */
+    z-index: 9999;
+    pointer-events: none;
+    mix-blend-mode: overlay; /* Смешивание с основным фоном */
 }
 
 /* Стили для скроллбара */
@@ -68,6 +87,8 @@ nav {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     width: 100%;
     border-bottom: 2px solid #FFF19B;
+    position: relative;
+    z-index: 10;
 }
 
 .navbar {
@@ -187,8 +208,8 @@ nav {
     height: 50vh;
     min-height: 500px;
     overflow: hidden;
-    margin-bottom: 0; /* Убираем отступ снизу */
-    background: inherit; /* наследует фон от body */
+    margin-bottom: 0;
+    background: inherit;
 }
 
 .hero-carousel::after {
@@ -197,15 +218,13 @@ nav {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px; /* меньше высота */
+    height: 60px;
     background: linear-gradient(to bottom, 
         rgba(36, 33, 31, 0) 0%, 
         #24211f 100%);
     z-index: 3;
     pointer-events: none;
 }
-
-
 
 .carousel-slides {
     display: flex;
@@ -239,7 +258,7 @@ nav {
     background-image: inherit;
     background-size: cover;
     background-position: center;
-    filter: blur(2px) brightness(0.7); /* Блюр + затемнение в одном фильтре */
+    filter: blur(2px) brightness(0.7);
     z-index: 1;
     transform: scale(1.1);
 }
@@ -358,10 +377,9 @@ nav {
     right: 20px;
 }
 
-
 /* Основное содержимое */
 .main-content {
-    margin-top: -15px; /* Поднимаем контент вверх */
+    margin-top: -15px;
     position: relative;
     z-index: 3;
     padding: 80px 5%;
@@ -444,7 +462,7 @@ nav {
 
 /* Современный футер */
 .modern-footer {
-    background: transparent; /* фон убрали */
+    background: transparent;
     color: #fff;
     padding: 60px 5% 30px;
     position: relative;
@@ -563,76 +581,10 @@ nav {
     font-size: 0.9rem;
 }
 
-/* Адаптивность */
-@media (max-width: 1024px) {
-    .footer-columns {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .nav-links {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .nav-links li {
-        width: 100%;
-        text-align: center;
-        padding: 5px 0;
-    }
-
-    .carousel-content h2 {
-        font-size: 2rem;
-    }
-    
-    .carousel-content p {
-        font-size: 1rem;
-    }
-    
-    .footer-columns {
-        grid-template-columns: 1fr;
-    }
-    
-    .dropdown-menu {
-        position: static;
-        width: 100%;
-        display: none;
-        box-shadow: none;
-        margin-top: 5px;
-    }
-}
-
-@media (max-width: 480px) {
-    .logo {
-        font-size: 1.2rem;
-    }
-
-    .carousel-content h2 {
-        font-size: 1.8rem;
-    }
-
-    .section-header h2 {
-        font-size: 1.8rem;
-    }
-
-    .feature-card {
-        padding: 20px;
-    }
-    
-    .footer-social {
-        justify-content: center;
-    }
-}
 /* === Главная: квадратные промо-карточки === */
 .promo-grid{
   display: grid;
-  grid-template-columns: repeat(4, 300px); /* как в news: ширина превью 300 */
+  grid-template-columns: repeat(4, 300px);
   gap: 25px;
   justify-content: center;
 }
@@ -640,7 +592,7 @@ nav {
 .promo-card{
   position: relative;
   width: 300px;
-  height: 250px;                  /* прямоугольник, как в news */
+  height: 250px;
   border-radius: 5px;
   overflow: hidden;
   background: #111 center/cover no-repeat;
@@ -663,7 +615,6 @@ nav {
 
 .promo-overlay{
   position:absolute; inset:0;
-  /* мягкий затемняющий градиент как на макете */
   background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.85) 100%);
 }
 
@@ -676,17 +627,17 @@ nav {
 .promo-badges{
   display:flex; justify-content:space-between; align-items:center; gap:8px;
   font-size:12px; line-height:1; user-select:none;
-  font-family: 'Manrope', sans-serif; /* Добавлено */
+  font-family: 'Manrope', sans-serif;
 }
 .promo-tag{
   color:#fff; background:rgba(255,255,255,.12);
   padding:6px 10px; border-radius:10px; backdrop-filter:blur(2px);
-   font-family: 'Manrope', sans-serif; /* Добавлено */
+   font-family: 'Manrope', sans-serif;
 }
 .promo-date{
   color:#e6e6e6; background:rgba(0,0,0,.35);
   padding:6px 10px; border-radius:10px;
-  font-family: 'Manrope', sans-serif; /* Добавлено */
+  font-family: 'Manrope', sans-serif;
 }
 
 .promo-title{ color:#fff; font-weight:800; font-size:16px; line-height:1.2; transition:color .2s ease; }
@@ -697,18 +648,6 @@ nav {
   opacity:0; transform:translateY(10px); transition:opacity .25s ease, transform .25s ease;
 }
 .promo-card:hover .promo-btn{ opacity:1; transform:translateY(0); }
-
-/* адаптив, чтобы на узких экранах карточки не ломались */
-@media (max-width: 1280px){
-  .promo-grid{ grid-template-columns: repeat(3, 300px); }
-}
-@media (max-width: 980px){
-  .promo-grid{ grid-template-columns: repeat(2, 300px); }
-}
-@media (max-width: 640px){
-  .promo-grid{ grid-template-columns: 1fr; }
-  .promo-card{ width:100%; height:200px; }
-}
 
 /* === Модальное окно === */
 .modal-overlay{
@@ -805,7 +744,7 @@ nav {
   width:44px; height:44px; border:none; border-radius:12px;
   background:rgba(255,255,255,.14); color:#fff; font-size:26px; cursor:pointer;
 }
-.image-zoom-prev{ left:-56px; } .image-zoom-next{ right:-56px; font-family: 'Manrope', sans-serif; /* Добавлено */;}
+.image-zoom-prev{ left:-56px; } .image-zoom-next{ right:-56px; font-family: 'Manrope', sans-serif;}
 
 .fade-in{ animation:fade-in .2s ease; }
 @keyframes fade-in{ from{opacity:0} to{opacity:1} }
@@ -814,8 +753,87 @@ nav {
   position:absolute; inset:auto 12px 12px 12px;
   background:rgba(0,0,0,.6); color:#fff; padding:8px 10px; border-radius:10px;
   font-size:14px;
-  font-family: 'Manrope', sans-serif; /* Добавлено */
+  font-family: 'Manrope', sans-serif;
 }
 
 /* Немного подправим отступы секции, чтобы карточки «дышали» */
 .features-section .section-header{ margin-bottom:16px; }
+
+/* Адаптивность */
+@media (max-width: 1280px){
+  .promo-grid{ grid-template-columns: repeat(3, 300px); }
+}
+@media (max-width: 1024px) {
+    .footer-columns {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 980px){
+  .promo-grid{ grid-template-columns: repeat(2, 300px); }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+        padding: 5px 0;
+    }
+
+    .carousel-content h2 {
+        font-size: 2rem;
+    }
+    
+    .carousel-content p {
+        font-size: 1rem;
+    }
+    
+    .footer-columns {
+        grid-template-columns: 1fr;
+    }
+    
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        display: none;
+        box-shadow: none;
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 640px){
+  .promo-grid{ grid-template-columns: 1fr; }
+  .promo-card{ width:100%; height:200px; }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .carousel-content h2 {
+        font-size: 1.8rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .feature-card {
+        padding: 20px;
+    }
+    
+    .footer-social {
+        justify-content: center;
+    }
+}
