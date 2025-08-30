@@ -2,6 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('mainCardsGrid');
   const modalOverlay = document.getElementById('modalOverlay');
   const modalContainer = document.getElementById('modalContainer');
+  const nav = document.querySelector('nav');
+  
+  // Сохраняем оригинальные стили навигации
+  let originalNavDisplay = '';
+  let originalNavVisibility = '';
+  let originalNavOpacity = '';
+  
+  if (nav) {
+    const computedStyle = getComputedStyle(nav);
+    originalNavDisplay = computedStyle.display;
+    originalNavVisibility = computedStyle.visibility;
+    originalNavOpacity = computedStyle.opacity;
+  }
 
   function parseDate(str) {
   if (!str) return 0;
@@ -80,6 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === Модалка ===
   function openModal(article) {
+    // Скрываем навигацию при открытии модального окна
+    if (nav) {
+      nav.style.visibility = 'hidden';
+      nav.style.opacity = '0';
+      nav.style.pointerEvents = 'none';
+    }
+    
     modalContainer.innerHTML = `
       <div class="modal-image-container">
         <img src="${article.image}" alt="${article.title}" class="modal-image">
@@ -105,6 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeModal() {
+    // Восстанавливаем навигацию при закрытии модального окна
+    if (nav) {
+      nav.style.visibility = originalNavVisibility;
+      nav.style.opacity = originalNavOpacity;
+      nav.style.pointerEvents = 'auto';
+    }
+    
     modalOverlay.classList.remove('active');
     document.body.style.overflow = 'auto';
   }
@@ -145,26 +172,44 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex = 0;
 
   function openImageZoom(images, startIndex = 0) {
+    // Скрываем навигацию при открытии лайтбокса
+    if (nav) {
+      nav.style.visibility = 'hidden';
+      nav.style.opacity = '0';
+      nav.style.pointerEvents = 'none';
+    }
+    
     currentImages = images;
     currentIndex = startIndex;
     showZoomImage();
     imageZoomOverlay.classList.add('active');
   }
+  
   function closeImageZoom() {
+    // Восстанавливаем навигацию при закрытии лайтбокса
+    if (nav) {
+      nav.style.visibility = originalNavVisibility;
+      nav.style.opacity = originalNavOpacity;
+      nav.style.pointerEvents = 'auto';
+    }
+    
     imageZoomOverlay.classList.remove('active');
     currentImages = [];
     currentIndex = 0;
   }
+  
   function showPrevImage() {
     if (!currentImages.length) return;
     currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
     showZoomImage();
   }
+  
   function showNextImage() {
     if (!currentImages.length) return;
     currentIndex = (currentIndex + 1) % currentImages.length;
     showZoomImage();
   }
+  
   function showZoomImage() {
     if (!currentImages.length) return;
     const { src, alt } = currentImages[currentIndex];
