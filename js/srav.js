@@ -441,13 +441,21 @@ function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType 
   const baseDamage = calculateDamageAtDistance(enhanced, distance, selectorId);
   const ap = getTotalArmorPiercing(selectorId);
 
+  // Эффективное ХП цели с учётом брони и бронебойности
   const effHP = ((bulletResist - bulletResist * ap) + 100) * (targetHP / 100);
 
   const damage = baseDamage * hitMult;
 
+  // shotsToKill и TTK
+  const shotsToKill = effHP / damage;
+  const timeToKill = shotsToKill * (60 / rof);
+
+  // DPS теперь зависит от AP (через TTK)
+  const dps = targetHP / timeToKill;
+
   return {
-    dps: (damage * rof) / 60,
-    ttk: (effHP / damage) * (60 / rof),
+    dps,
+    ttk: timeToKill,
     damage,
     rof,
     ap,
@@ -576,14 +584,17 @@ function calculateMetrics(weapon, bulletResist, targetHP, selectorId) {
 
   return {
     effectiveHP: ((targetHP * (bulletResist / 100))).toFixed(1),
+
     closeDPS: close.dps.toFixed(1),
     farDPS: far.dps.toFixed(1),
     closeHeadshotDPS: closeHS.dps.toFixed(1),
     farHeadshotDPS: farHS.dps.toFixed(1),
+
     closeTTK: close.ttk.toFixed(3),
     farTTK: far.ttk.toFixed(3),
     closeHeadshotTTK: closeHS.ttk.toFixed(3),
     farHeadshotTTK: farHS.ttk.toFixed(3),
+
     armorPiercing: (close.ap * 100).toFixed(1) + '%',
     closeDamage: close.damage.toFixed(1),
     farDamage: far.damage.toFixed(1),
