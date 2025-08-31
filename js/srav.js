@@ -91,6 +91,9 @@ function initEventListeners() {
   // Событие по всей области выбора
   document.querySelectorAll('.selector-box').forEach(box => {
     box.addEventListener('click', (e) => {
+      // если превью уже показано (предмет выбран) — не открываем модалку
+      const preview = box.querySelector('.artifact-preview');
+      if (preview && !preview.classList.contains('hidden')) return;
       currentSelector = box.id; // "selector1" или "selector2"
       toggleModal(modal, true);
       displayItems();
