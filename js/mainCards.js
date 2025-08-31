@@ -94,11 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Модалка ===
   function openModal(article) {
     // Скрываем навигацию при открытии модального окна
-    if (nav) {
-      nav.style.visibility = 'hidden';
-      nav.style.opacity = '0';
-      nav.style.pointerEvents = 'none';
-    }
     
     modalContainer.innerHTML = `
       <div class="modal-image-container">
@@ -125,13 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeModal() {
-    // Восстанавливаем навигацию при закрытии модального окна
-    if (nav) {
-      nav.style.visibility = originalNavVisibility;
-      nav.style.opacity = originalNavOpacity;
-      nav.style.pointerEvents = 'auto';
-    }
-    
     modalOverlay.classList.remove('active');
     document.body.style.overflow = 'auto';
   }
@@ -172,12 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex = 0;
 
   function openImageZoom(images, startIndex = 0) {
-    // Скрываем навигацию при открытии лайтбокса
-    if (nav) {
-      nav.style.visibility = 'hidden';
-      nav.style.opacity = '0';
-      nav.style.pointerEvents = 'none';
-    }
     
     currentImages = images;
     currentIndex = startIndex;
@@ -186,13 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function closeImageZoom() {
-    // Восстанавливаем навигацию при закрытии лайтбокса
-    if (nav) {
-      nav.style.visibility = originalNavVisibility;
-      nav.style.opacity = originalNavOpacity;
-      nav.style.pointerEvents = 'auto';
-    }
-    
     imageZoomOverlay.classList.remove('active');
     currentImages = [];
     currentIndex = 0;

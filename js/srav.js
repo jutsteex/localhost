@@ -79,10 +79,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initEventListeners() {
+  // Событие по кнопке выбора
   document.querySelectorAll('.select-btn').forEach(btn => {
-    btn.addEventListener('click', () => { currentSelector = btn.dataset.target; toggleModal(modal, true); displayItems(); });
+    btn.addEventListener('click', () => {
+      currentSelector = btn.dataset.target;
+      toggleModal(modal, true);
+      displayItems();
+    });
   });
 
+  // Событие по всей области выбора
+  document.querySelectorAll('.selector-box').forEach(box => {
+    box.addEventListener('click', (e) => {
+      currentSelector = box.id; // "selector1" или "selector2"
+      toggleModal(modal, true);
+      displayItems();
+    });
+  });
+
+  // Закрытие модалок
   [modal, advancedModal].forEach(m => {
     if (!m) return;
     m.addEventListener('click', e => { if (e.target === m) toggleModal(m, false); });
@@ -90,26 +105,42 @@ function initEventListeners() {
     m.querySelector('.close-btn')?.addEventListener('click', () => toggleModal(m, false));
   });
 
+  // Поиск по предметам
   addInputListener(artifactSearch, e => {
     const cat = document.querySelector('.tab-btn.active')?.dataset.category || 'all';
     displayItems(e.target.value, cat);
   }, 200);
 
+  // Переключение вкладок категорий
   document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     displayItems(artifactSearch?.value || '', btn.dataset.category);
   }));
 
+  // Кнопка сравнения
   compareBtn?.addEventListener('click', () => {
     compareItems();
-    if (currentType === 'weapon') { toggleModal(advancedModal, true); showAdvancedComparison(); }
+    if (currentType === 'weapon') { 
+      toggleModal(advancedModal, true); 
+      showAdvancedComparison(); 
+    }
   });
 
-  calculateBtn?.addEventListener('click', () => { showAdvancedComparison(); toggleModal(advancedModal, true); });
+  // Пересчёт в расширенном сравнении
+  calculateBtn?.addEventListener('click', () => { 
+    showAdvancedComparison(); 
+    toggleModal(advancedModal, true); 
+  });
 
-  itemTypeSelect?.addEventListener('change', e => { currentType = e.target.value; resetComparison(); loadItems(); });
+  // Смена типа предметов
+  itemTypeSelect?.addEventListener('change', e => { 
+    currentType = e.target.value; 
+    resetComparison(); 
+    loadItems(); 
+  });
 
+  // Обновление графиков при изменении входных параметров
   addInputListener(document.getElementById('bullet-resist'), () => {
     if (currentType === 'weapon' && selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
   });
@@ -117,6 +148,7 @@ function initEventListeners() {
     if (currentType === 'weapon' && selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
   });
 
+  // Переключение на вкладки в расширенном сравнении
   document.getElementById('info-tab')?.addEventListener('click', showInfoView);
   document.getElementById('metrics-tab')?.addEventListener('click', showDamageTableView);
 }
@@ -244,30 +276,46 @@ function selectItem(item) {
 // Парсинг и математика
 // ===============================
 function extractDamageStats(txt) {
-  if (!txt) return { closeDamage: 0, farDamage: 0, maxDistance: 0, armorPiercing: 0 };
+  if (!txt) return { closeDamage: 0, farDamage: 0, maxDistance: 0, startDistance: 0, armorPiercing: 0 };
+
   const dmg = /Урон:\s*([\d,.]+)(?:\s*\|\s*([\d,.]+)м\s*-\s*([\d,.]+)\s*\|\s*([\d,.]+)м)?/i.exec(txt);
-  let close = 0, far = 0, max = 0;
+
+  let close = 0, start = 0, far = 0, max = 0;
   if (dmg) {
     close = parseFloat(dmg[1].replace(',', '.'));
-    far = dmg[3] ? parseFloat(dmg[3].replace(',', '.')) : close;
-    max = dmg[4] ? parseFloat(dmg[4].replace(',', '.')) : 0;
+    start = dmg[2] ? parseFloat(dmg[2].replace(',', '.')) : 0;
+    far   = dmg[3] ? parseFloat(dmg[3].replace(',', '.')) : close;
+    max   = dmg[4] ? parseFloat(dmg[4].replace(',', '.')) : 0;
   }
+
   const dist = /(?:Макс.*дистанция|Дальность):\s*([\d,.]+)м/i.exec(txt);
   if (dist) max = parseFloat(dist[1].replace(',', '.'));
+
   const ap = /Броне.*?:\s*\+?([\d,.]+)%/i.exec(txt);
-  return { closeDamage: close, farDamage: far, maxDistance: max, armorPiercing: ap ? parseFloat(ap[1].replace(',', '.')) / 100 : 0 };
+
+  return {
+    closeDamage: close,
+    farDamage: far,
+    maxDistance: max,
+    startDistance: start,
+    armorPiercing: ap ? parseFloat(ap[1].replace(',', '.')) / 100 : 0
+  };
 }
 
 const extractRateOfFire = txt => /Скорострельность:\s*([\d,.]+)/i.exec(txt)?.[1] ? parseFloat(/Скорострельность:\s*([\d,.]+)/i.exec(txt)[1].replace(',', '.') ) : 0;
 const extractHeadshotMultiplier = txt => /Множитель в голову:\s*([\d,.]+)/i.exec(txt)?.[1] ? parseFloat(/Множитель в голову:\s*([\d,.]+)/i.exec(txt)[1].replace(',', '.') ) : 1.5;
 
 function calculateDamageAtDistance(weapon, distance) {
-  const damageStats = extractDamageStats(weapon.xaract);
-  const maxDistance = damageStats.maxDistance || 50;
-  if (distance <= 15) return damageStats.closeDamage;
-  if (distance >= maxDistance) return damageStats.farDamage;
-  const progress = (distance - 15) / (maxDistance - 15);
-  return damageStats.closeDamage + (damageStats.farDamage - damageStats.closeDamage) * progress;
+  const dmgStats = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
+  const maxDistance   = dmgStats.maxDistance   || 50;
+  const startDistance = dmgStats.startDistance || 0;
+
+  if (distance <= startDistance) return dmgStats.closeDamage;
+  if (distance >= maxDistance)   return dmgStats.farDamage;
+
+  const span = Math.max(1, maxDistance - startDistance);
+  const progress = (distance - startDistance) / span;
+  return dmgStats.closeDamage + (dmgStats.farDamage - dmgStats.closeDamage) * progress;
 }
 
 function applyEnhancement(weapon, selector) {
@@ -330,11 +378,14 @@ function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType 
   };
 }
 
-function calculateMetrics(weapon, bulletResist, targetHP, selectorOverride) {
-  const close    = calcWeaponAtDistance(weapon, 0, bulletResist, targetHP, 'bodyshot');
-  const far      = calcWeaponAtDistance(weapon, 50, bulletResist, targetHP, 'bodyshot');
-  const closeHS  = calcWeaponAtDistance(weapon, 0, bulletResist, targetHP, 'headshot');
-  const farHS    = calcWeaponAtDistance(weapon, 50, bulletResist, targetHP, 'headshot');
+function calculateMetrics(weapon, bulletResist, targetHP) {
+  const base = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
+  const farDist = +(base.maxDistance || 50).toFixed(1);
+
+  const close   = calcWeaponAtDistance(weapon, 0,       bulletResist, targetHP, 'bodyshot');
+  const far     = calcWeaponAtDistance(weapon, farDist, bulletResist, targetHP, 'bodyshot');
+  const closeHS = calcWeaponAtDistance(weapon, 0,       bulletResist, targetHP, 'headshot');
+  const farHS   = calcWeaponAtDistance(weapon, farDist, bulletResist, targetHP, 'headshot');
 
   return {
     effectiveHP: ((targetHP * (bulletResist / 100))).toFixed(1),
@@ -347,10 +398,10 @@ function calculateMetrics(weapon, bulletResist, targetHP, selectorOverride) {
     closeHeadshotTTK: closeHS.ttk.toFixed(3),
     farHeadshotTTK: farHS.ttk.toFixed(3),
     armorPiercing: (close.ap * 100).toFixed(1) + '%',
-    closeDamage: Math.round(close.damage),
-    farDamage: Math.round(far.damage),
-    maxDistance: 50,
-    rateOfFire: Math.round(close.rof),
+    closeDamage: close.damage.toFixed(1),
+    farDamage: far.damage.toFixed(1),
+    maxDistance: farDist,
+    rateOfFire: close.rof.toFixed(1),
     damageDrop: ((1 - far.damage / close.damage) * 100).toFixed(1) + '%',
     headshotMultiplier: close.hsMult.toFixed(2),
   };
@@ -482,29 +533,33 @@ function showAdvancedComparison() {
 }
 
 function updateComparisonTable(metrics1, metrics2) {
-    const weapon1Stats = document.getElementById('weapon1-stats');
-    const weapon2Stats = document.getElementById('weapon2-stats');
-    if (!weapon1Stats || !weapon2Stats) return;
+const weapon1Stats = document.getElementById('weapon1-stats');
+const weapon2Stats = document.getElementById('weapon2-stats');
+if (!weapon1Stats || !weapon2Stats) return;
 
-    weapon1Stats.innerHTML = '';
-    weapon2Stats.innerHTML = '';
 
-    const distances = [0, 50]; // Примерные точки для "близко" и "далеко"
-    const data1 = calculateWeaponData(selectedItems.selector1, distances);
-    const data2 = calculateWeaponData(selectedItems.selector2, distances);
+weapon1Stats.innerHTML = '';
+weapon2Stats.innerHTML = '';
 
-    const stats = [
-        { name: 'TTK HS (близко)', value: data1[0] },
-        { name: 'TTK (далеко)', value: data2[Math.floor(distances.length / 2)] },
-        { name: 'TTK HS (далеко)', value: data1[distances.length - 1] },
-    ];
 
-    stats.forEach(stat => {
-        const el1 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value, 'equal');
-        const el2 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value, 'equal'); // Для простоты используем одинаковые значения, можно адаптировать
-        weapon1Stats.appendChild(el1);
-        weapon2Stats.appendChild(el2);
-    });
+const distances = [0, 50]; // Примерные точки для "близко" и "далеко"
+const data1 = calculateWeaponData(selectedItems.selector1, distances);
+const data2 = calculateWeaponData(selectedItems.selector2, distances);
+
+
+const stats = [
+{ name: 'TTK HS (близко)', value1: data1[0], value2: data2[0] },
+{ name: 'TTK (далеко)', value1: data1[Math.floor(distances.length / 2)], value2: data2[Math.floor(distances.length / 2)] },
+{ name: 'TTK HS (далеко)', value1: data1[distances.length - 1], value2: data2[distances.length - 1] },
+];
+
+
+stats.forEach(stat => {
+const el1 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value1, 'equal');
+const el2 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value2, 'equal');
+weapon1Stats.appendChild(el1);
+weapon2Stats.appendChild(el2);
+});
 }
 
 function createStatElement(stat, value, className) {
@@ -543,29 +598,34 @@ function updateDetailedChart() {
 // Данные для графика
 // ===============================
 function calculateWeaponData(weapon, distances) {
-  const targetHP = parseFloat(document.getElementById('target-hp')?.value) || 132;
-  const bulletResist = parseFloat(document.getElementById('bullet-resist')?.value) || 250;
+const targetHP = parseFloat(document.getElementById('target-hp')?.value) || 132;
+const bulletResist = parseFloat(document.getElementById('bullet-resist')?.value) || 250;
 
-  return distances.map(distance => {
-    const data = calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, currentHitType);
-    return currentMetric === 'dps'
-      ? Math.round(data.dps * 100) / 100
-      : Math.round(data.ttk * 1000) / 1000;
-  });
+
+const selector = selectedItems.selector1 === weapon ? 'selector1' : 'selector2';
+const enhanced = applyEnhancement(weapon, selector);
+
+
+return distances.map(distance => {
+const data = calcWeaponAtDistance(enhanced, distance, bulletResist, targetHP, currentHitType);
+return currentMetric === 'dps'
+? Math.round(data.dps * 100) / 100
+: Math.round(data.ttk * 1000) / 1000;
+});
 }
 
 function createDetailedWeaponChart() {
   const ctx = document.getElementById('detailed-chart');
   if (!ctx) return;
-  
+
   if (detailedChart) detailedChart.destroy();
 
-  const weapon1 = applyEnhancement(selectedItems.selector1, 'selector1');
-  const weapon2 = applyEnhancement(selectedItems.selector2, 'selector2');
-  
+  const enhanced1 = applyEnhancement(selectedItems.selector1, 'selector1');
+  const enhanced2 = applyEnhancement(selectedItems.selector2, 'selector2');
+
   const distances = Array.from({ length: 46 }, (_, i) => i * 2); // 0-90 метров с шагом 2
-  const data1 = calculateWeaponData(weapon1, distances);
-  const data2 = calculateWeaponData(weapon2, distances);
+  const data1 = calculateWeaponData(enhanced1, distances);
+  const data2 = calculateWeaponData(enhanced2, distances);
 
   detailedChart = new Chart(ctx.getContext('2d'), {
     type: 'line',
@@ -613,9 +673,6 @@ function createDetailedWeaponChart() {
         onHover(event, active) {
           event.native.target.style.cursor = active.length ? 'pointer' : 'default';
         }
-      },
-      onClick(event, active) {
-        if (active.length > 0) { /* точка клика — зарезервировано*/ }
       },
       interaction: { intersect: false, mode: 'index', axis: 'x' },
       plugins: {
@@ -693,7 +750,7 @@ function createDetailedWeaponChart() {
       }
     }
   });
-  
+
   updateChartLegend();
 }
 
@@ -836,13 +893,21 @@ function compareItems() {
 
   return lines.map(line => {
     if (line.startsWith("Урон")) {
-      const dmg = w._enhancedDamage;
-      return `Урон: ${Math.round(dmg.closeDamage)} | ${Math.round(dmg.maxDistance)}м - ${Math.round(dmg.farDamage)} | ${Math.round(dmg.maxDistance)}м`;
+      const dmg = w._enhancedDamage || extractDamageStats(origXaract);
+      const close = dmg.closeDamage.toFixed(1);
+      const far   = dmg.farDamage.toFixed(1);
+      const start = dmg.startDistance ? dmg.startDistance.toFixed(1) : null;
+      const max   = dmg.maxDistance   ? dmg.maxDistance.toFixed(1)   : null;
+
+      const startPart = start ? `${start}м - ` : '';
+      const maxPart   = max   ? `${max}м`      : '';
+
+      return `Урон: ${close} | ${startPart}${far} | ${maxPart}`;
     }
     if (line.startsWith("Скорострельность") && w._enhancedRof) {
-      return `Скорострельность: ${Math.round(w._enhancedRof)} выстрелов/мин`;
+      return `Скорострельность: ${w._enhancedRof.toFixed(1)} выстрелов/мин`;
     }
-    return line; // все остальные строки без изменений
+    return line;
   }).join('\n');
 }
 
