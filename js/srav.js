@@ -23,6 +23,7 @@ let customArmorPiercing = { selector1: null, selector2: null };
 let detailedChart = null;
 let currentHitType = 'headshot'; // headshot | bodyshot | limbshot
 let currentMetric = 'ttk';       // 'ttk' | 'dps'
+let selectedAmmo = { selector1: null, selector2: null };
 
 // Инвертированное сравнение
 const invertedStats = new Set([
@@ -70,6 +71,22 @@ function loadAmmo() {
 // ===============================
 // Инициализация
 // ===============================
+
+document.querySelectorAll("[id$='-ammo']").forEach(select => {
+  select.addEventListener("change", (e) => {
+    const selectorId = e.target.id.replace("-ammo", "");
+    const weapon = selectedItems[selectorId];
+    if (!weapon) return;
+
+    const chosenAmmo = weapon.ammoTypes.find(ammo => ammo.id === e.target.value);
+    if (chosenAmmo) {
+      selectedAmmo[selectorId] = chosenAmmo;
+    }
+
+    updateDetailedChart();
+  });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   loadAmmo().then(() => {
     initEventListeners();
@@ -240,39 +257,96 @@ function displayItems(filter = '', category = 'all') {
 
 function selectItem(item) {
   if (!currentSelector) return;
-  selectedItems[currentSelector] = item;
-  customArmorPiercing[currentSelector] = null;
 
-  const box = document.getElementById(currentSelector);
+  // Фиксируем селектор локально
+  const selectorId = currentSelector;
+
+  // Привязываем предмет к селектору
+  selectedItems[selectorId] = item;
+
+  // Сбрасываем выбранный патрон только для этого оружия
+  selectedAmmo[selectorId] = null;
+
+  // Найти контейнер селектора
+  const box = document.getElementById(selectorId);
   const placeholder = box?.querySelector('.selector-placeholder');
   const preview = box?.querySelector('.artifact-preview');
+
   if (placeholder) placeholder.style.display = 'none';
+
   if (preview) {
+    // Доступные патроны строго по типу оружия
+    const ammoOptions = currentType === 'weapon'
+      ? ammoData.filter(a => a.type === item.ammoType)
+      : [];
+
+    // Рендер превью
     preview.classList.remove('hidden');
     preview.innerHTML = `
       <img src="${item.image}" alt="${item.name}">
       <h4>${item.name}</h4>
       <div class="artifact-category">${item.categories?.[0] || ''}</div>
       ${currentType === 'weapon' ? `
-        <div class="enhancement">
-          <label>Заточка:</label>
-          <select id="${currentSelector}-enhance">
-            <option value="none">+0</option>
-            <option value="basic">+15</option>
-          </select>
-        </div>
-        ` : ''}
+      <div class="enhancement">
+        <label>Заточка:</label>
+        <select id="${selectorId}-enhance">
+          <option value="none">+0</option>
+          <option value="basic">+15</option>
+        </select>
+      </div>
+      <div class="enhancement">
+        <label>Патроны:</label>
+        <select id="${selectorId}-ammo">
+          ${ammoOptions.map((a, i) =>
+            `<option value="${a.name}" ${i === 0 ? 'selected' : ''}>${a.name}</option>`
+          ).join('')}
+        </select>
+      </div>
+      ` : ''}
     `;
 
-    document.getElementById(`${currentSelector}-ap`)?.addEventListener('change', e => {
-      const v = parseFloat(e.target.value);
-      customArmorPiercing[currentSelector] = isNaN(v) ? null : v / 100;
-      if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
-    });
+    // Обработчик заточки
+    const enhanceSelect = document.getElementById(`${selectorId}-enhance`);
+    if (enhanceSelect) {
+      enhanceSelect.addEventListener('change', () => {
+        if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
+      });
+    }
+
+    // Обработчик патронов
+    const ammoSelect = document.getElementById(`${selectorId}-ammo`);
+    if (ammoSelect) {
+      // Автовыбор первого патрона
+      if (ammoOptions.length > 0) {
+        const chosenAmmo = ammoOptions.find(a => a.name === ammoSelect.value);
+        selectedAmmo[selectorId] = chosenAmmo || null;
+      } else {
+        selectedAmmo[selectorId] = null;
+      }
+
+      ammoSelect.addEventListener('change', (e) => {
+        const chosenAmmo = ammoOptions.find(a => a.name === e.target.value);
+        selectedAmmo[selectorId] = chosenAmmo || null;
+
+        if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
+      });
+    } else {
+      selectedAmmo[selectorId] = null;
+    }
   }
 
+  // Закрыть модалку выбора
   toggleModal(modal, false);
-  if (compareBtn) compareBtn.disabled = !(selectedItems.selector1 && selectedItems.selector2);
+
+  // Кнопка сравнения активна только если выбраны оба
+  if (compareBtn) {
+    compareBtn.disabled = !(selectedItems.selector1 && selectedItems.selector2);
+  }
+
+  // Если оба выбраны — обновим графики и таблицу
+  if (selectedItems.selector1 && selectedItems.selector2) {
+    updateDetailedChart();
+  }
 }
 
 // ===============================
@@ -308,17 +382,25 @@ function extractDamageStats(txt) {
 const extractRateOfFire = txt => /Скорострельность:\s*([\d,.]+)/i.exec(txt)?.[1] ? parseFloat(/Скорострельность:\s*([\d,.]+)/i.exec(txt)[1].replace(',', '.') ) : 0;
 const extractHeadshotMultiplier = txt => /Множитель в голову:\s*([\d,.]+)/i.exec(txt)?.[1] ? parseFloat(/Множитель в голову:\s*([\d,.]+)/i.exec(txt)[1].replace(',', '.') ) : 1.5;
 
-function calculateDamageAtDistance(weapon, distance) {
-  const dmgStats = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
-  const maxDistance   = dmgStats.maxDistance   || 50;
-  const startDistance = dmgStats.startDistance || 0;
+function calculateDamageAtDistance(weapon, distance, selectorId) {
+  const stats = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
+  let { closeDamage, farDamage, startDistance, maxDistance } = stats;
 
-  if (distance <= startDistance) return dmgStats.closeDamage;
-  if (distance >= maxDistance)   return dmgStats.farDamage;
+  // Базовый урон по дистанции (линейная интерполяция между closeDamage и farDamage)
+  let damage;
+  if (distance <= (startDistance || 0)) damage = closeDamage;
+  else if (distance >= (maxDistance || 0)) damage = farDamage;
+  else {
+    const t = (distance - startDistance) / Math.max(1e-6, (maxDistance - startDistance));
+    damage = closeDamage - (closeDamage - farDamage) * t;
+  }
 
-  const span = Math.max(1, maxDistance - startDistance);
-  const progress = (distance - startDistance) / span;
-  return dmgStats.closeDamage + (dmgStats.farDamage - dmgStats.closeDamage) * progress;
+  // Модификатор патрона
+  const extra = getAmmoExtraDamage(selectorId) || 0;
+  if (Math.abs(extra) < 1) damage *= (1 + extra); // относительный %
+  else damage += extra;                              // абсолютная прибавка
+
+  return damage;
 }
 
 function applyEnhancement(weapon, selector) {
@@ -344,35 +426,27 @@ function applyEnhancement(weapon, selector) {
   return enhanced;
 }
 
-function getTotalArmorPiercing(weapon) {
-  const dmg = extractDamageStats(weapon.xaract);
-  const extraAP = dmg.armorPiercing; // из xaract
-  const ammo = ammoData.find(a => a.type === weapon.ammoType);
-  const ammoAP = ammo ? ammo.armorPiercing : 0;
-  return extraAP + ammoAP;
-}
-
 // Универсальный расчёт урона/TTK/DPS
 
-function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType = 'bodyshot') {
-  const selector = selectedItems.selector1 === weapon ? 'selector1' : 'selector2';
-  const enhanced = applyEnhancement(weapon, selector);
+function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType = 'bodyshot', selectorId) {
+  const enhanced = applyEnhancement(weapon, selectorId);
 
-  const dmgStats = enhanced._enhancedDamage || extractDamageStats(enhanced.xaract);
-  const rof = enhanced._enhancedRof || extractRateOfFire(enhanced.xaract);
+  const rof    = enhanced._enhancedRof || extractRateOfFire(enhanced.xaract);
   const hsMult = extractHeadshotMultiplier(enhanced.xaract);
 
   let hitMult = 1.0;
   if (hitType === 'headshot') hitMult = hsMult;
   else if (hitType === 'limbshot') hitMult = 0.8;
 
-  const ap = getTotalArmorPiercing(enhanced);
-  const effHP = ((bulletResist - (bulletResist * ap)) + 100) * (targetHP / 100);
+  const baseDamage = calculateDamageAtDistance(enhanced, distance, selectorId);
+  const ap = getTotalArmorPiercing(selectorId);
 
-  const damage = calculateDamageAtDistance(enhanced, distance) * hitMult;
+  const effHP = ((bulletResist - bulletResist * ap) + 100) * (targetHP / 100);
+
+  const damage = baseDamage * hitMult;
 
   return {
-    dps: (damage * rof / 60),
+    dps: (damage * rof) / 60,
     ttk: (effHP / damage) * (60 / rof),
     damage,
     rof,
@@ -381,14 +455,124 @@ function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType 
   };
 }
 
-function calculateMetrics(weapon, bulletResist, targetHP) {
+//
+// ===== Ammo helpers =====
+//
+
+function getAmmoExtraDamage(selectorId) {
+  const sel = selectedAmmo[selectorId];
+  if (!sel) return 0;
+
+  if (typeof sel.extraDamage !== 'undefined') {
+    const v = Number(sel.extraDamage);
+    return isFinite(v) ? v : 0;
+  }
+
+  const ammo = ammoData.find(a =>
+    (!sel.type || a.type === sel.type) &&
+    a.name?.toLowerCase() === sel.name?.toLowerCase()
+  );
+  const v = ammo ? Number(ammo.extraDamage) : 0;
+  return isFinite(v) ? v : 0;
+}
+
+function getWeaponBaseArmorPiercing(selectorId) {
+  const weapon = selectedItems[selectorId];
+  if (!weapon) return 0;
+  const dmg = extractDamageStats(weapon.xaract);
+  const v = Number(dmg.armorPiercing);
+  return isFinite(v) ? v : 0;
+}
+
+function getAmmoArmorPiercing(selectorId) {
+  const sel = selectedAmmo[selectorId];
+  if (!sel) return 0;
+
+  if (typeof sel.armorPiercing !== 'undefined') {
+    const v = Number(sel.armorPiercing);
+    return isFinite(v) ? v : 0;
+  }
+
+  const ammo = ammoData.find(a =>
+    (!sel.type || a.type === sel.type) &&
+    a.name?.toLowerCase() === sel.name?.toLowerCase()
+  );
+  const v = ammo ? Number(ammo.armorPiercing) : 0;
+  return isFinite(v) ? v : 0;
+}
+
+function getTotalArmorPiercing(selectorId) {
+  const total = getWeaponBaseArmorPiercing(selectorId) + getAmmoArmorPiercing(selectorId);
+  // допускаем отрицательные значения, но не больше 95%
+  return Math.min(0.95, total);
+}
+
+//
+// ===== Damage calc =====
+//
+
+function calculateDamageAtDistance(weapon, distance, selectorId) {
+  const stats = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
+  let { closeDamage, farDamage, startDistance, maxDistance } = stats;
+
+  let damage;
+  if (distance <= (startDistance || 0)) damage = closeDamage;
+  else if (distance >= (maxDistance || 0)) damage = farDamage;
+  else {
+    const t = (distance - startDistance) / Math.max(1e-6, (maxDistance - startDistance));
+    damage = closeDamage - (closeDamage - farDamage) * t;
+  }
+
+  const extra = getAmmoExtraDamage(selectorId) || 0;
+  if (Math.abs(extra) < 1) damage *= (1 + extra);
+  else damage += extra;
+
+  return damage;
+}
+
+//
+// ===== Main DPS/TTK calc =====
+//
+
+function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType = 'bodyshot', selectorId) {
+  const enhanced = applyEnhancement(weapon, selectorId);
+
+  const rof    = enhanced._enhancedRof || extractRateOfFire(enhanced.xaract);
+  const hsMult = extractHeadshotMultiplier(enhanced.xaract);
+
+  let hitMult = 1.0;
+  if (hitType === 'headshot') hitMult = hsMult;
+  else if (hitType === 'limbshot') hitMult = 0.8;
+
+  const baseDamage = calculateDamageAtDistance(enhanced, distance, selectorId);
+  const ap = getTotalArmorPiercing(selectorId);
+
+  const effHP = ((bulletResist - bulletResist * ap) + 100) * (targetHP / 100);
+
+  const damage = baseDamage * hitMult;
+
+  return {
+    dps: (damage * rof) / 60,
+    ttk: (effHP / damage) * (60 / rof),
+    damage,
+    rof,
+    ap,
+    hsMult
+  };
+}
+
+//
+// ===== Metrics for tables/charts =====
+//
+
+function calculateMetrics(weapon, bulletResist, targetHP, selectorId) {
   const base = weapon._enhancedDamage || extractDamageStats(weapon.xaract);
   const farDist = +(base.maxDistance || 50).toFixed(1);
 
-  const close   = calcWeaponAtDistance(weapon, 0,       bulletResist, targetHP, 'bodyshot');
-  const far     = calcWeaponAtDistance(weapon, farDist, bulletResist, targetHP, 'bodyshot');
-  const closeHS = calcWeaponAtDistance(weapon, 0,       bulletResist, targetHP, 'headshot');
-  const farHS   = calcWeaponAtDistance(weapon, farDist, bulletResist, targetHP, 'headshot');
+  const close   = calcWeaponAtDistance(weapon, 0,       bulletResist, targetHP, 'bodyshot', selectorId);
+  const far     = calcWeaponAtDistance(weapon, farDist, bulletResist, targetHP, 'bodyshot', selectorId);
+  const closeHS = calcWeaponAtDistance(weapon, 0,       bulletResist, targetHP, 'headshot', selectorId);
+  const farHS   = calcWeaponAtDistance(weapon, farDist, bulletResist, targetHP, 'headshot', selectorId);
 
   return {
     effectiveHP: ((targetHP * (bulletResist / 100))).toFixed(1),
@@ -410,159 +594,195 @@ function calculateMetrics(weapon, bulletResist, targetHP) {
   };
 }
 
+function getAmmoExtraDamage(selectorId) {
+  const sel = selectedAmmo[selectorId];
+  if (!sel) return 0;
+
+  // Если это целый объект из ammoData
+  if (typeof sel.extraDamage !== 'undefined') {
+    const v = Number(sel.extraDamage);
+    return isFinite(v) ? v : 0;
+  }
+
+  // Если сохранились только type/name → ищем в ammoData
+  const ammo = ammoData.find(a =>
+    (!sel.type || a.type === sel.type) &&
+    a.name?.toLowerCase() === sel.name?.toLowerCase()
+  );
+  const v = ammo ? Number(ammo.extraDamage) : 0;
+  return isFinite(v) ? v : 0;
+}
+
+function getWeaponBaseArmorPiercing(selectorId) {
+  const weapon = selectedItems[selectorId];
+  if (!weapon) return 0;
+  const dmg = extractDamageStats(weapon.xaract); // armorPiercing в долях (0..1)
+  const v = Number(dmg.armorPiercing);
+  return isFinite(v) ? v : 0;
+}
+
+function getAmmoArmorPiercing(selectorId) {
+  const sel = selectedAmmo[selectorId];
+  if (!sel) return 0;
+
+  if (typeof sel.armorPiercing !== 'undefined') {
+    const v = Number(sel.armorPiercing);
+    return isFinite(v) ? v : 0;
+  }
+
+  const ammo = ammoData.find(a =>
+    (!sel.type || a.type === sel.type) &&
+    a.name?.toLowerCase() === sel.name?.toLowerCase()
+  );
+  const v = ammo ? Number(ammo.armorPiercing) : 0;
+  return isFinite(v) ? v : 0;
+}
+
+function getTotalArmorPiercing(selectorId) {
+  const total = getWeaponBaseArmorPiercing(selectorId) + getAmmoArmorPiercing(selectorId);
+  return Math.min(0.95, total); // допускаем < 0, но не даём > 95%
+}
+
 // ===============================
 // Расширенное сравнение 
 // ===============================
 function showAdvancedComparison() {
-    if (!selectedItems.selector1 || !selectedItems.selector2) {
-        console.error('Не выбраны оба предмета для сравнения');
-        return;
+  if (!selectedItems.selector1 || !selectedItems.selector2) {
+    console.error('Не выбраны оба предмета для сравнения');
+    return;
+  }
+
+  initDetailedChartControls();
+
+  const bulletResist = parseInt(document.getElementById('bullet-resist').value) || 250;
+  const targetHP = parseFloat(document.getElementById('target-hp').value) || 100;
+  
+  const enhanced1 = applyEnhancement(selectedItems.selector1, 'selector1');
+  const enhanced2 = applyEnhancement(selectedItems.selector2, 'selector2');
+  const metrics1 = calculateMetrics(enhanced1, bulletResist, targetHP, 'selector1');
+  const metrics2 = calculateMetrics(enhanced2, bulletResist, targetHP, 'selector2');
+
+  // Обновляем таблицу и графики
+  updateDetailedChart();
+  updateComparisonTable(metrics1, metrics2);
+
+  try {
+    const weapon1Img = document.getElementById('weapon1-img');
+    const weapon1Name = document.getElementById('weapon1-name');
+    const weapon2Img = document.getElementById('weapon2-img');
+    const weapon2Name = document.getElementById('weapon2-name');
+    
+    if (weapon1Img) weapon1Img.src = selectedItems.selector1.image;
+    if (weapon1Name) weapon1Name.textContent = selectedItems.selector1.name;
+    if (weapon2Img) weapon2Img.src = selectedItems.selector2.image;
+    if (weapon2Name) weapon2Name.textContent = selectedItems.selector2.name;
+  } catch (e) {
+    console.error('Ошибка при обновлении информации о предметах:', e);
+  }
+
+  const stats1El = document.getElementById('weapon1-stats');
+  const stats2El = document.getElementById('weapon2-stats');
+  if (!stats1El || !stats2El) return;
+
+  stats1El.innerHTML = '';
+  stats2El.innerHTML = '';
+
+  const stats = [
+    { name: 'Урон (близко)', key: 'closeDamage', suffix: '' },
+    { name: 'Урон (далеко)', key: 'farDamage', suffix: '' },
+    { name: 'Падение урона', key: 'damageDrop', suffix: '' },
+    { name: 'Эффективная дистанция', key: 'maxDistance', suffix: 'м' },
+    { name: 'Скорострельность', key: 'rateOfFire', suffix: 'выстр/мин' },
+    { name: 'Бронепробитие', key: 'armorPiercing', suffix: '' },
+    { name: 'Приведёнка', key: 'effectiveHP', suffix: '' },
+    { name: 'DPS (близко)', key: 'closeDPS', suffix: '' },
+    { name: 'DPS (далеко)', key: 'farDPS', suffix: '' },
+    { name: 'DPS HS (близко)', key: 'closeHeadshotDPS', suffix: '' },
+    { name: 'DPS HS (далеко)', key: 'farHeadshotDPS', suffix: '' },
+    { name: 'TTK (близко)', key: 'closeTTK', suffix: 'сек' },
+    { name: 'TTK (далеко)', key: 'farTTK', suffix: 'сек' },
+    { name: 'TTK HS (близко)', key: 'closeHeadshotTTK', suffix: 'сек' },
+    { name: 'TTK HS (далеко)', key: 'farHeadshotTTK', suffix: 'сек' },
+    { name: 'Множитель в голову', key: 'headshotMultiplier', suffix: 'x' },
+  ];
+  
+  stats.forEach(stat => {
+    const value1 = metrics1[stat.key];
+    const value2 = metrics2[stat.key];
+    
+    let class1 = 'equal';
+    let class2 = 'equal';
+    
+    if (value1 !== undefined && value2 !== undefined) {
+      const num1 = parseFloat(value1);
+      const num2 = parseFloat(value2);
+      
+      if (stat.key.includes('TTK')) {
+        class1 = num1 < num2 ? 'better' : num1 > num2 ? 'worse' : 'equal';
+      } else {
+        class1 = num1 > num2 ? 'better' : num1 < num2 ? 'worse' : 'equal';
+      }
+      
+      class2 = class1 === 'better' ? 'worse' : class1 === 'worse' ? 'better' : 'equal';
     }
-
-    initDetailedChartControls();
-
-    const bulletResist = parseInt(document.getElementById('bullet-resist').value) || 250;
-    const targetHP = parseFloat(document.getElementById('target-hp').value) || 100;
     
-    const enhanced1 = applyEnhancement(selectedItems.selector1, 'selector1');
-    const enhanced2 = applyEnhancement(selectedItems.selector2, 'selector2');
-    const metrics1 = calculateMetrics(enhanced1, bulletResist, targetHP, 'selector1');
-    const metrics2 = calculateMetrics(enhanced2, bulletResist, targetHP, 'selector2');
+    if (stats1El) stats1El.appendChild(createStatElement(stat, value1, class1));
+    if (stats2El) stats2El.appendChild(createStatElement(stat, value2, class2));
+  });
 
-    // Обновляем таблицу и графики
-    updateDetailedChart();
-    updateComparisonTable(metrics1, metrics2);
+  // Создаем графики
+  createDPSChart(metrics1, metrics2);
+  createTTKChart(metrics1, metrics2);
 
+  // Показываем DPS по умолчанию
+  showDPSChart();
 
-    try {
-        const weapon1Img = document.getElementById('weapon1-img');
-        const weapon1Name = document.getElementById('weapon1-name');
-        const weapon2Img = document.getElementById('weapon2-img');
-        const weapon2Name = document.getElementById('weapon2-name');
-        
-        if (weapon1Img) weapon1Img.src = selectedItems.selector1.image;
-        if (weapon1Name) weapon1Name.textContent = selectedItems.selector1.name;
-        if (weapon2Img) weapon2Img.src = selectedItems.selector2.image;
-        if (weapon2Name) weapon2Name.textContent = selectedItems.selector2.name;
-    } catch (e) {
-        console.error('Ошибка при обновлении информации о предметах:', e);
+  if (advancedModal) {
+    advancedModal.classList.add('active');
+    advancedModal.classList.remove('hidden');
+    
+    const infoTab = document.getElementById('info-tab');
+    const metricsTab = document.getElementById('metrics-tab');
+    const infoView = document.getElementById('info-view');
+    const metricsView = document.getElementById('metrics-view');
+    
+    if (infoTab && metricsTab && infoView && metricsView) {
+      infoTab.classList.add('active');
+      metricsTab.classList.remove('active');
+      infoView.classList.remove('hidden');
+      metricsView.classList.add('hidden');
     }
-
-    const stats1El = document.getElementById('weapon1-stats');
-    const stats2El = document.getElementById('weapon2-stats');
-    if (!stats1El || !stats2El) {
-        console.error('Не найдены элементы для отображения статистик');
-        return;
+    
+    if (infoView) {
+      infoView.scrollTop = 0;
     }
-
-    stats1El.innerHTML = '';
-    stats2El.innerHTML = '';
-    
-    const stats = [
-        { name: 'Урон (близко)', key: 'closeDamage', suffix: '' },
-        { name: 'Урон (далеко)', key: 'farDamage', suffix: '' },
-        { name: 'Падение урона', key: 'damageDrop', suffix: '' },
-        { name: 'Эффективная дистанция', key: 'maxDistance', suffix: 'м' },
-        { name: 'Скорострельность', key: 'rateOfFire', suffix: 'выстр/мин' },
-        { name: 'Бронепробитие', key: 'armorPiercing', suffix: '' },
-        { name: 'Приведёнка', key: 'effectiveHP', suffix: '' },
-        { name: 'DPS (близко)', key: 'closeDPS', suffix: '' },
-        { name: 'DPS (далеко)', key: 'farDPS', suffix: '' },
-        { name: 'DPS HS (близко)', key: 'closeHeadshotDPS', suffix: '' },
-        { name: 'DPS HS (далеко)', key: 'farHeadshotDPS', suffix: '' },
-        { name: 'TTK (близко)', key: 'closeTTK', suffix: 'сек' },
-        { name: 'TTK (далеко)', key: 'farTTK', suffix: 'сек' },
-        { name: 'TTK HS (близко)', key: 'closeHeadshotTTK', suffix: 'сек' },
-        { name: 'TTK HS (далеко)', key: 'farHeadshotTTK', suffix: 'сек' },
-        { name: 'Множитель в голову', key: 'headshotMultiplier', suffix: 'x' },
-
-    ];
-    
-    stats.forEach(stat => {
-        const value1 = metrics1[stat.key];
-        const value2 = metrics2[stat.key];
-        
-        let class1 = 'equal';
-        let class2 = 'equal';
-        
-        if (value1 !== undefined && value2 !== undefined) {
-            const num1 = parseFloat(value1);
-            const num2 = parseFloat(value2);
-            
-            if (stat.key.includes('TTK')) {
-                class1 = num1 < num2 ? 'better' : num1 > num2 ? 'worse' : 'equal';
-            } else {
-                class1 = num1 > num2 ? 'better' : num1 < num2 ? 'worse' : 'equal';
-            }
-            
-            class2 = class1 === 'better' ? 'worse' : class1 === 'worse' ? 'better' : 'equal';
-        }
-        
-        if (stats1El) stats1El.appendChild(createStatElement(stat, value1, class1));
-        if (stats2El) stats2El.appendChild(createStatElement(stat, value2, class2));
-    });
-    
-    // Создаем графики
-    createDPSChart(metrics1, metrics2);
-    createTTKChart(metrics1, metrics2);
-    
-    // Показываем DPS по умолчанию
-    showDPSChart();
-    
-    try {
-        if (advancedModal) {
-            advancedModal.classList.add('active');
-            advancedModal.classList.remove('hidden');
-            
-            const infoTab = document.getElementById('info-tab');
-            const metricsTab = document.getElementById('metrics-tab');
-            const infoView = document.getElementById('info-view');
-            const metricsView = document.getElementById('metrics-view');
-            
-            if (infoTab && metricsTab && infoView && metricsView) {
-                infoTab.classList.add('active');
-                metricsTab.classList.remove('active');
-                infoView.classList.remove('hidden');
-                metricsView.classList.add('hidden');
-            }
-            
-            if (infoView) {
-                infoView.scrollTop = 0;
-            }
-        }
-    } catch (e) {
-        console.error('Ошибка при отображении модального окна:', e);
-    }
+  }
 }
 
 function updateComparisonTable(metrics1, metrics2) {
-const weapon1Stats = document.getElementById('weapon1-stats');
-const weapon2Stats = document.getElementById('weapon2-stats');
-if (!weapon1Stats || !weapon2Stats) return;
+  const weapon1Stats = document.getElementById('weapon1-stats');
+  const weapon2Stats = document.getElementById('weapon2-stats');
+  if (!weapon1Stats || !weapon2Stats) return;
 
+  weapon1Stats.innerHTML = '';
+  weapon2Stats.innerHTML = '';
 
-weapon1Stats.innerHTML = '';
-weapon2Stats.innerHTML = '';
+  const distances = [0, 50]; // Примерные точки для "близко" и "далеко"
+  const data1 = calculateWeaponData(selectedItems.selector1, distances, 'selector1');
+  const data2 = calculateWeaponData(selectedItems.selector2, distances, 'selector2');
 
+  const stats = [
+    { name: 'TTK HS (близко)', value1: data1[0], value2: data2[0] },
+    { name: 'TTK (далеко)', value1: data1[Math.floor(distances.length / 2)], value2: data2[Math.floor(distances.length / 2)] },
+    { name: 'TTK HS (далеко)', value1: data1[distances.length - 1], value2: data2[distances.length - 1] },
+  ];
 
-const distances = [0, 50]; // Примерные точки для "близко" и "далеко"
-const data1 = calculateWeaponData(selectedItems.selector1, distances);
-const data2 = calculateWeaponData(selectedItems.selector2, distances);
-
-
-const stats = [
-{ name: 'TTK HS (близко)', value1: data1[0], value2: data2[0] },
-{ name: 'TTK (далеко)', value1: data1[Math.floor(distances.length / 2)], value2: data2[Math.floor(distances.length / 2)] },
-{ name: 'TTK HS (далеко)', value1: data1[distances.length - 1], value2: data2[distances.length - 1] },
-];
-
-
-stats.forEach(stat => {
-const el1 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value1, 'equal');
-const el2 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value2, 'equal');
-weapon1Stats.appendChild(el1);
-weapon2Stats.appendChild(el2);
-});
+  stats.forEach(stat => {
+    const el1 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value1, 'equal');
+    const el2 = createStatElement({ name: stat.name, key: stat.name, suffix: ' сек' }, stat.value2, 'equal');
+    weapon1Stats.appendChild(el1);
+    weapon2Stats.appendChild(el2);
+  });
 }
 
 function createStatElement(stat, value, className) {
@@ -600,21 +820,18 @@ function updateDetailedChart() {
 // ===============================
 // Данные для графика
 // ===============================
-function calculateWeaponData(weapon, distances) {
-const targetHP = parseFloat(document.getElementById('target-hp')?.value) || 132;
-const bulletResist = parseFloat(document.getElementById('bullet-resist')?.value) || 250;
+function calculateWeaponData(weapon, distances, selectorId) {
+  const targetHP = parseFloat(document.getElementById('target-hp')?.value) || 132;
+  const bulletResist = parseFloat(document.getElementById('bullet-resist')?.value) || 250;
 
+  const enhanced = applyEnhancement(weapon, selectorId);
 
-const selector = selectedItems.selector1 === weapon ? 'selector1' : 'selector2';
-const enhanced = applyEnhancement(weapon, selector);
-
-
-return distances.map(distance => {
-const data = calcWeaponAtDistance(enhanced, distance, bulletResist, targetHP, currentHitType);
-return currentMetric === 'dps'
-? Math.round(data.dps * 100) / 100
-: Math.round(data.ttk * 1000) / 1000;
-});
+  return distances.map(distance => {
+    const data = calcWeaponAtDistance(enhanced, distance, bulletResist, targetHP, currentHitType, selectorId);
+    return currentMetric === 'dps'
+      ? Math.round(data.dps * 100) / 100
+      : Math.round(data.ttk * 1000) / 1000;
+  });
 }
 
 function createDetailedWeaponChart() {
@@ -623,20 +840,36 @@ function createDetailedWeaponChart() {
 
   if (detailedChart) detailedChart.destroy();
 
+  // Формируем подписи (название + заточка + патрон)
+  const enhanceMap = { none: '+0', basic: '+15' };
+  const enh1Val = document.getElementById('selector1-enhance')?.value || 'none';
+  const enh2Val = document.getElementById('selector2-enhance')?.value || 'none';
+  const enh1 = enhanceMap[enh1Val] || enh1Val;
+  const enh2 = enhanceMap[enh2Val] || enh2Val;
+
+  const ammo1 = (selectedAmmo.selector1 && selectedAmmo.selector1.name) ? selectedAmmo.selector1.name : '—';
+  const ammo2 = (selectedAmmo.selector2 && selectedAmmo.selector2.name) ? selectedAmmo.selector2.name : '—';
+
+  const label1 = `${selectedItems.selector1.name} (${enh1}, ${ammo1})`;
+  const label2 = `${selectedItems.selector2.name} (${enh2}, ${ammo2})`;
+
+  // Применяем заточку к оружию
   const enhanced1 = applyEnhancement(selectedItems.selector1, 'selector1');
   const enhanced2 = applyEnhancement(selectedItems.selector2, 'selector2');
 
-  const distances = Array.from({ length: 46 }, (_, i) => i * 2); // 0-90 метров с шагом 2
-  const data1 = calculateWeaponData(enhanced1, distances);
-  const data2 = calculateWeaponData(enhanced2, distances);
+  // Дистанции и данные
+  const distances = Array.from({ length: 46 }, (_, i) => i * 2); // 0–90 м шагом 2
+  const data1 = calculateWeaponData(enhanced1, distances, 'selector1');
+  const data2 = calculateWeaponData(enhanced2, distances, 'selector2');
 
+  // Чарт
   detailedChart = new Chart(ctx.getContext('2d'), {
     type: 'line',
     data: {
       labels: distances.map(d => `${d}м`),
       datasets: [
         {
-          label: selectedItems.selector1.name,
+          label: label1,
           data: data1,
           borderColor: 'rgba(54, 162, 235, 1)',
           backgroundColor: 'rgba(54, 162, 235, 0.1)',
@@ -650,7 +883,7 @@ function createDetailedWeaponChart() {
           pointHoverBorderWidth: 3
         },
         {
-          label: selectedItems.selector2.name,
+          label: label2,
           data: data2,
           borderColor: 'rgba(75, 192, 192, 1)',
           backgroundColor: 'rgba(75, 192, 192, 0.1)',
@@ -669,14 +902,6 @@ function createDetailedWeaponChart() {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 300 },
-      hover: {
-        mode: 'index',
-        intersect: false,
-        animationDuration: 200,
-        onHover(event, active) {
-          event.native.target.style.cursor = active.length ? 'pointer' : 'default';
-        }
-      },
       interaction: { intersect: false, mode: 'index', axis: 'x' },
       plugins: {
         tooltip: {
@@ -687,11 +912,7 @@ function createDetailedWeaponChart() {
           borderColor: '#FFF19B',
           borderWidth: 2,
           cornerRadius: 8,
-          displayColors: true,
           padding: 12,
-          titleFont: { size: 14, weight: 'bold' },
-          bodyFont: { size: 12 },
-          footerFont: { size: 11 },
           callbacks: {
             title(context) { return `Дистанция: ${context[0].label}`; },
             label(context) {
@@ -703,51 +924,20 @@ function createDetailedWeaponChart() {
             }
           }
         },
-        legend: { display: false }
+        legend: { display: false } // у вас используется кастомная легенда ниже
       },
       scales: {
         x: {
-          title: {
-            display: true,
-            text: 'Дистанция (м)',
-            color: '#FFF19B',
-            font: { size: 14, weight: 'bold' }
-          },
-          grid: {
-            color: 'rgba(255,241,155,0.1)',
-            drawBorder: false,
-            lineWidth: 1
-          },
-          ticks: {
-            color: '#FFF19B',
-            callback(value, index) {
-              return index % 10 === 0 ? this.getLabelForValue(value) : '';
-            },
-            font: { size: 11 },
-            maxTicksLimit: 15
-          }
+          title: { display: true, text: 'Дистанция (м)', color: '#FFF19B' },
+          ticks: { color: '#FFF19B', maxTicksLimit: 15 }
         },
         y: {
-          title: {
-            display: true,
-            text: currentMetric === 'dps' ? 'Урон в секунду' : 'Время до убийства (сек)',
-            color: '#FFF19B',
-            font: { size: 14, weight: 'bold' }
+          title: { 
+            display: true, 
+            text: currentMetric === 'dps' ? 'Урон в секунду' : 'Время до убийства (сек)', 
+            color: '#FFF19B' 
           },
-          grid: {
-            color: 'rgba(255,241,155,0.1)',
-            drawBorder: false,
-            lineWidth: 1
-          },
-          ticks: {
-            color: '#FFF19B',
-            stepSize: currentMetric === 'dps' ? 50 : 0.2,
-            callback(v) {
-              return currentMetric === 'dps' ? Math.round(v) : (v % 1 === 0 ? v : v.toFixed(1));
-            },
-            font: { size: 11 },
-            maxTicksLimit: 10
-          },
+          ticks: { color: '#FFF19B', maxTicksLimit: 10 },
           beginAtZero: true
         }
       }

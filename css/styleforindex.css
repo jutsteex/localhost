@@ -657,7 +657,7 @@ nav {
   display:none; align-items:center; justify-content:center;
   background:rgba(0,0,0,.6);
   padding:24px; 
-  z-index:1000000;
+  z-index:99999;
   
 }
 .modal-overlay.active{ display:flex; }
@@ -737,7 +737,7 @@ nav {
 #imageZoomOverlay{
   position:fixed; inset:0; display:none;
   align-items:center; justify-content:center;
-  background:rgba(0,0,0,.92); z-index:1100; padding:24px;
+  background:rgba(0,0,0,.92); z-index:110000; padding:24px;
 }
 #imageZoomOverlay.active{ display:flex; }
 

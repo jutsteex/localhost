@@ -1,11 +1,21 @@
 {
   "ammo": [
-    { "type": "9мм", "armorPiercing": 0.12 },
-    { "type": "12.7x108", "armorPiercing": 0.4 },
-    { "type": "Аккумулятор", "armorPiercing": 0.65 },
-    { "type": "7мм", "armorPiercing": 0.2 },
-    { "type": "5мм", "armorPiercing": 0.15 },
-    { "type": "20x110", "armorPiercing": 0.4 },
-    { "type": "Жакан", "armorPiercing": 0.2 }
+    { "type": "9мм", "name":"Бронебойный","armorPiercing": 0.12, "extraDamage": 0},
+    { "type": "9мм", "name":"Стандартный","armorPiercing": -0.05, "extraDamage": 0 },
+    { "type": "9мм", "name":"Экспансивный","armorPiercing": -0.25, "extraDamage": 0.2 },
+    { "type": "12.7x108","name":"Стандартный", "armorPiercing": 0.4, "extraDamage": 0 },
+    { "type": "Аккумулятор","name":"Аккумулятор", "armorPiercing": 0.65, "extraDamage": 0 },
+    { "type": "Аккумулятор","name":"Кустарный аккумулятор", "armorPiercing": 0.4, "extraDamage": 0 },
+    { "type": "7мм", "name":"Бронебойный", "armorPiercing": 0.2, "extraDamage": 0 },
+    { "type": "7мм", "name":"Стандартный", "armorPiercing": 0.03, "extraDamage": 0 },
+    { "type": "7мм", "name":"Экспансивный", "armorPiercing": -0.25, "extraDamage": 0.2 },
+    { "type": "5мм", "name":"Бронебойный", "armorPiercing": 0.15, "extraDamage": 0 },
+    { "type": "5мм", "name":"Стандартный", "armorPiercing": 0, "extraDamage": 0 },
+    { "type": "5мм", "name":"Экспансивный", "armorPiercing": -0.25, "extraDamage": 0.2 },
+    { "type": "20x110", "name":"Стандартный", "armorPiercing": 0.5, "extraDamage": 0 },
+    { "type": "20x110", "name":"Щебень", "armorPiercing": 0.3, "extraDamage": 0 },
+    { "type": "Жакан", "name":"Пуля 12-го кал.", "armorPiercing": 0.2, "extraDamage": 0 },
+    { "type": "Жакан", "name":"Картечь 12-го кал.", "armorPiercing": 0, "extraDamage": 0 },
+    { "type": "Жакан", "name":"Дробь 12-го кал.", "armorPiercing": -0.5, "extraDamage": 0.2 }
   ]
 }
