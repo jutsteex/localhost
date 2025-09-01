@@ -741,14 +741,42 @@ nav {
 }
 #imageZoomOverlay.active{ display:flex; }
 
-.image-zoom-container{ position:relative; max-width:95vw; max-height:95vh; }
-.image-zoom-img{ max-width:100%; max-height:95vh; border-radius:8px; }
-.image-zoom-prev, .image-zoom-next{
-  position:absolute; top:50%; transform:translateY(-50%);
-  width:44px; height:44px; border:none; border-radius:12px;
-  background:rgba(255,255,255,.14); color:#fff; font-size:26px; cursor:pointer;
+.image-zoom-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }
-.image-zoom-prev{ left:-56px; } .image-zoom-next{ right:-56px; font-family: 'Manrope', sans-serif;}
+
+.image-zoom-container {
+  position: relative;
+  max-width: 95vw;
+  max-height: 95vh;
+  overflow: auto;
+  scrollbar-width: none; /* Firefox */
+}
+.image-zoom-img {
+  width: auto;
+  height: auto;
+  max-width: 95vw;   /* ✅ отключаем сжатие */
+  max-height: 120vh;  /* ✅ отключаем сжатие */
+  display: block;
+  margin: auto;
+}
+.image-zoom-prev, .image-zoom-next {
+  position: fixed; /* ✅ вместо absolute */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  z-index: 120000; /* ✅ поверх всего */
+}
+
+.image-zoom-prev { left: 20px; }
+.image-zoom-next { right: 20px; }
 
 .fade-in{ animation:fade-in .2s ease; }
 @keyframes fade-in{ from{opacity:0} to{opacity:1} }

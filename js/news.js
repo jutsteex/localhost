@@ -210,6 +210,58 @@ if (searchInput) {
     showZoomImage();
   }
 
+  // === Свайпы (телефон + ПК, с закрытием от края) через Pointer Events ===
+zoomImg.draggable = false;           // отключаем drag-ghost
+zoomImg.style.userSelect = 'none';   // не выделяется текст
+zoomImg.style.touchAction = 'pan-y'; // вертикальные свайпы = скролл, горизонтальные = наши жесты
+
+let swipeActive = false;
+let swipeStartX = 0;
+let swipeLastX = 0;
+
+function onPointerDown(e) {
+  swipeActive = true;
+  swipeStartX = e.clientX;
+  swipeLastX = e.clientX;
+  if (zoomImg.setPointerCapture) {
+    try { zoomImg.setPointerCapture(e.pointerId); } catch (_) {}
+  }
+}
+
+function onPointerMove(e) {
+  if (!swipeActive) return;
+  swipeLastX = e.clientX;
+}
+
+function onPointerUpOrCancel(e) {
+  if (!swipeActive) return;
+  swipeActive = false;
+  const dx = swipeLastX - swipeStartX;
+  const THRESHOLD = 50; // минимальная длина свайпа
+
+  // Закрытие при свайпе от края
+  if (swipeStartX < 30 && dx > THRESHOLD) {
+    closeImageZoom();
+    return;
+  }
+  if (swipeStartX > window.innerWidth - 30 && dx < -THRESHOLD) {
+    closeImageZoom();
+    return;
+  }
+
+  // Перелистывание
+  if (dx <= -THRESHOLD) showNextImage();
+  else if (dx >= THRESHOLD) showPrevImage();
+}
+
+zoomImg.addEventListener('pointerdown', onPointerDown, { passive: true });
+zoomImg.addEventListener('pointermove', onPointerMove, { passive: true });
+zoomImg.addEventListener('pointerup', onPointerUpOrCancel, { passive: true });
+zoomImg.addEventListener('pointercancel', onPointerUpOrCancel, { passive: true });
+
+// На случай, если курсор ушёл с картинки (ПК)
+window.addEventListener('mouseup', onPointerUpOrCancel);
+
   zoomPrev.addEventListener('click', showPrevImage);
   zoomNext.addEventListener('click', showNextImage);
   imageZoomOverlay.addEventListener('click', (e) => {
