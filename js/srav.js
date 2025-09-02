@@ -44,6 +44,30 @@ const enhancementBonuses = {
 };
 
 // ===============================
+// Таблица уровней заточки (0–15)
+// ===============================
+const level_table = [
+    0,
+    0.0634,
+    0.1109,
+    0.1422,
+    0.1673,
+    0.1969,
+    0.2316,
+    0.2725,
+    0.3206,
+    0.3771,
+    0.4737,
+    0.5220,
+    0.6141,
+    0.7225,
+    0.8124,
+    1
+];
+
+const MAX_ARTIFACT_PERCENT = 135;
+
+// ===============================
 // Утилиты
 // ===============================
 const debounce = (fn, delay = 200) => {
@@ -258,95 +282,103 @@ function displayItems(filter = '', category = 'all') {
 function selectItem(item) {
   if (!currentSelector) return;
 
-  // Фиксируем селектор локально
   const selectorId = currentSelector;
-
-  // Привязываем предмет к селектору
   selectedItems[selectorId] = item;
-
-  // Сбрасываем выбранный патрон только для этого оружия
   selectedAmmo[selectorId] = null;
 
-  // Найти контейнер селектора
   const box = document.getElementById(selectorId);
   const placeholder = box?.querySelector('.selector-placeholder');
   const preview = box?.querySelector('.artifact-preview');
-
   if (placeholder) placeholder.style.display = 'none';
+  if (!preview) return;
 
-  if (preview) {
-    // Доступные патроны строго по типу оружия
-    const ammoOptions = currentType === 'weapon'
-      ? ammoData.filter(a => a.type === item.ammoType)
-      : [];
+  // патроны только для оружия
+  const ammoOptions = currentType === 'weapon'
+    ? (Array.isArray(ammoData) ? ammoData.filter(a => a.type === item.ammoType) : [])
+    : [];
 
-    // Рендер превью
-    preview.classList.remove('hidden');
-    preview.innerHTML = `
-      <img src="${item.image}" alt="${item.name}">
-      <h4>${item.name}</h4>
-      <div class="artifact-category">${item.categories?.[0] || ''}</div>
-      ${currentType === 'weapon' ? `
+  // заточка — для оружия и брони
+  const enhanceHTML = (currentType === 'weapon' || currentType === 'armor')
+    ? `
       <div class="enhancement">
-        <label>Заточка:</label>
-        <select id="${selectorId}-enhance">
-          <option value="none">+0</option>
-          <option value="basic">+15</option>
+        <label for="${selectorId}-enhance">Заточка:</label>
+        <select id="${selectorId}-enhance" class="ap-input">
+          ${Array.from({ length: 16 }, (_, i) => `<option value="${i}">+${i}</option>`).join('')}
         </select>
       </div>
+    ` : '';
+
+  // патроны — только оружие
+  const ammoHTML = (currentType === 'weapon')
+    ? `
       <div class="enhancement">
-        <label>Патроны:</label>
-        <select id="${selectorId}-ammo">
-          ${ammoOptions.map((a, i) =>
-            `<option value="${a.name}" ${i === 0 ? 'selected' : ''}>${a.name}</option>`
-          ).join('')}
+        <label for="${selectorId}-ammo">Патроны:</label>
+        <select id="${selectorId}-ammo" class="ap-input">
+          ${ammoOptions.map((a, i) => `<option value="${a.name}" ${i===0?'selected':''}>${a.name}</option>`).join('')}
         </select>
       </div>
-      ` : ''}
-    `;
+    ` : '';
 
-    // Обработчик заточки
-    const enhanceSelect = document.getElementById(`${selectorId}-enhance`);
-    if (enhanceSelect) {
-      enhanceSelect.addEventListener('change', () => {
-        if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
-      });
-    }
+  // процент — только артефакты
+  const percentHTML = (currentType === 'artifacts')
+    ? `
+      <div class="enhancement">
+        <label for="${selectorId}-percent">Процент:</label>
+        <input type="number" id="${selectorId}-percent" class="ap-input" min="0" max="135" value="100" />
+      </div>
+    ` : '';
 
-    // Обработчик патронов
-    const ammoSelect = document.getElementById(`${selectorId}-ammo`);
-    if (ammoSelect) {
-      // Автовыбор первого патрона
-      if (ammoOptions.length > 0) {
-        const chosenAmmo = ammoOptions.find(a => a.name === ammoSelect.value);
-        selectedAmmo[selectorId] = chosenAmmo || null;
-      } else {
-        selectedAmmo[selectorId] = null;
-      }
+  preview.classList.remove('hidden');
+  preview.innerHTML = `
+    <img src="${item.image}" alt="${item.name}">
+    <h4>${item.name}</h4>
+    <div class="artifact-category">${item.categories?.[0] || ''}</div>
+    ${enhanceHTML}
+    ${ammoHTML}
+    ${percentHTML}
+  `;
 
-      ammoSelect.addEventListener('change', (e) => {
-        const chosenAmmo = ammoOptions.find(a => a.name === e.target.value);
-        selectedAmmo[selectorId] = chosenAmmo || null;
-
-        if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
-      });
-    } else {
-      selectedAmmo[selectorId] = null;
-    }
+  // обработчики заточки
+  const enhanceSelect = document.getElementById(`${selectorId}-enhance`);
+  if (enhanceSelect) {
+    enhanceSelect.addEventListener('change', () => {
+      if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
+    });
   }
 
-  // Закрыть модалку выбора
+  // обработчики патронов
+  const ammoSelect = document.getElementById(`${selectorId}-ammo`);
+  if (ammoSelect) {
+    const chosenAmmo = ammoOptions.find(a => a.name === ammoSelect.value);
+    selectedAmmo[selectorId] = chosenAmmo || null;
+    ammoSelect.addEventListener('change', (e) => {
+      const a = ammoOptions.find(x => x.name === e.target.value);
+      selectedAmmo[selectorId] = a || null;
+      if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
+    });
+  } else {
+    selectedAmmo[selectorId] = null;
+  }
+
+  // обработчики процентов артефакта
+  const percentInput = document.getElementById(`${selectorId}-percent`);
+  if (percentInput) {
+    const clamp = () => {
+      let v = parseInt(percentInput.value, 10);
+      if (isNaN(v) || v < 0) v = 0;
+      if (v > 135) v = 135;
+      percentInput.value = v;
+    };
+    clamp();
+    percentInput.addEventListener('input', () => {
+      clamp();
+      if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
+    });
+  }
+
   toggleModal(modal, false);
-
-  // Кнопка сравнения активна только если выбраны оба
-  if (compareBtn) {
-    compareBtn.disabled = !(selectedItems.selector1 && selectedItems.selector2);
-  }
-
-  // Если оба выбраны — обновим графики и таблицу
-  if (selectedItems.selector1 && selectedItems.selector2) {
-    updateDetailedChart();
-  }
+  if (compareBtn) compareBtn.disabled = !(selectedItems.selector1 && selectedItems.selector2);
+  if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
 }
 
 // ===============================
@@ -402,26 +434,169 @@ function calculateDamageAtDistance(weapon, distance, selectorId) {
 
   return damage;
 }
+function parseNumberWithUnit(s) {
+  if (!s) return { num: 0, unit: '' };
+  const m = s.replace(/\s+/g,'').match(/([+\-]?\d+(?:[.,]\d+)?)(.*)$/);
+  if (!m) return { num: 0, unit: '' };
+  const num = parseFloat(m[1].replace(',', '.'));
+  const unit = (m[2] || '').trim();
+  return { num: isFinite(num) ? num : 0, unit };
+}
 
-function applyEnhancement(weapon, selector) {
-  const enhanceSelect = document.getElementById(`${selector}-enhance`);
-  if (!enhanceSelect || enhanceSelect.value === 'none') return weapon;
+function formatNumberWithUnit(val, unit) {
+  if (Math.abs(val) < 1e-3) {
+    return '0' + (unit || '');
+  }
+  const sign = val > 0 ? '+' : '';
+  const numStr = Math.abs(val).toFixed(2).replace('.', ',');
+  return (val < 0 ? '-' : sign) + numStr + (unit || '');
+}
 
-  const weaponType = weapon.categories?.[0]?.toLowerCase() || 'assault';
-  const bonuses = enhancementBonuses[weaponType] || enhancementBonuses.assault;
+// Возвращает { ключ: {min, max, unit} } — если нет диапазона, min==max
+function parseArtifactStatsRange(xaract) {
+  const res = {};
+  if (!xaract) return res;
 
-  // Копия, чтобы не портить оригинал
-  const enhanced = JSON.parse(JSON.stringify(weapon));
-  const dmgStats = extractDamageStats(enhanced.xaract);
-  const rof = extractRateOfFire(enhanced.xaract);
+  xaract.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
+    // Replace ';' with ':' to handle typos
+    line = line.replace(/;/g, ':');
+    const [rawKey, rawVal] = line.split(':');
+    if (!rawKey || !rawVal) return;
+    const key = rawKey.trim();
+    const val = rawVal.trim();
 
-  // Урон
-  dmgStats.closeDamage *= (1 + (bonuses.damage || 0));
-  dmgStats.farDamage   *= (1 + (bonuses.farDamage || 0));
-  enhanced._enhancedDamage = dmgStats;
+    if (val.includes('<->')) {
+      const [a, b] = val.split('<->').map(s => s.trim());
+      const A = parseNumberWithUnit(a);
+      const B = parseNumberWithUnit(b);
+      const unit = B.unit || A.unit || '';
+      res[key] = { min: A.num, max: B.num, unit };
+    } else {
+      const A = parseNumberWithUnit(val);
+      res[key] = { min: A.num, max: A.num, unit: A.unit };
+    }
+  });
 
-  // Скорострельность
-  enhanced._enhancedRof = rof * (1 + (bonuses.rateOfFire || 0));
+  return res;
+}
+
+// Масштабирование артефакта по проценту (0..135); blueStat добавляем при >=100%
+function buildArtifactScaledMap(item, percent) {
+  const p = Math.max(0, Math.min(MAX_ARTIFACT_PERCENT, Number(percent) || 0));
+
+  // 0) База (xaract) — парсим диапазоны
+  const base = parseArtifactStatsRange(item.xaract);
+
+  // 1) Нормализация ключей, чтобы база и блю совпадали
+  const normalizeKey = (k) => (k || '')
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[^a-z0-9а-яё]/gi, '');
+
+  // 2) Аккумулятор по нормализованному ключу
+  const acc = new Map(); // normKey -> { label, value, unit }
+
+  // 3) Интерполяция базы по проценту p (0..135)
+  Object.keys(base).forEach((label) => {
+    const { min, max, unit } = base[label];
+    const value = min + (max - min) * (p / 100);
+    const normKey = normalizeKey(label);
+    acc.set(normKey, { label, value, unit: unit || '' });
+  });
+
+  // 4) Блю-статы — добавляем ТОЛЬКО при p >= 100
+  const blueRaw = item.bluestats || item.blueStat || item.blueStats;
+  if (p >= 100 && blueRaw && blueRaw.trim() !== '-' && blueRaw.trim() !== '—') {
+    blueRaw.split('\n').map(s => s.trim()).filter(Boolean).forEach((line) => {
+      // Replace ';' with ':' to handle typos
+      line = line.replace(/;/g, ':');
+      const [rawKey, rawVal] = line.split(':');
+      if (!rawKey || !rawVal) return;
+
+      const label = rawKey.trim();
+      const { num, unit } = parseNumberWithUnit(rawVal.trim());
+      const normKey = normalizeKey(label);
+
+      const existed = acc.get(normKey);
+      if (existed) {
+        existed.value += num;
+        if (!existed.unit) existed.unit = unit || '';
+      } else {
+        acc.set(normKey, { label, value: num, unit: unit || '' });
+      }
+    });
+  }
+
+  // 5) Формируем результат (НЕ фильтруем нули)
+  const result = {};
+  for (const { label, value, unit } of acc.values()) {
+    result[label] = { value, unit: unit || '' };
+  }
+  return result;
+}
+
+// ===============================
+// Артефакты: пересчёт по проценту
+// ===============================
+function applyArtifactPercent(item, selector) {
+  const percentInput = document.getElementById(`${selector}-percent`);
+  if (!percentInput) return item;
+
+  const percent = parseInt(percentInput.value, 10) || 0;
+  const artifact = JSON.parse(JSON.stringify(item));
+
+  artifact._scaledStats = buildArtifactScaledMap(item, percent);
+  artifact._percent = percent;
+
+  return artifact;
+}
+
+
+
+// ===============================
+// Универсальная функция заточки
+// ===============================
+
+function applyEnhancement(item, selectorId) {
+  const enhanceSelect = document.getElementById(`${selectorId}-enhance`);
+  const level = enhanceSelect ? (parseInt(enhanceSelect.value, 10) || 0) : 0;
+  if (!level) return item;
+
+  const enhanced = JSON.parse(JSON.stringify(item));
+  const mult = level_table[level] || 0;
+
+  // Оружие: масштабируем close/far damage и RoF по таблице бонусов
+  if (currentType === 'weapon') {
+    const wType = (item.categories?.[0] || '').toLowerCase();
+    const bonuses = enhancementBonuses[wType] || enhancementBonuses.assault;
+
+    const dmgStats = extractDamageStats(enhanced.xaract);
+    const rof = extractRateOfFire(enhanced.xaract);
+
+    dmgStats.closeDamage *= (1 + (bonuses.damage    || 0) * mult);
+    dmgStats.farDamage   *= (1 + (bonuses.farDamage || 0) * mult);
+    enhanced._enhancedDamage = dmgStats;
+
+    if (!isNaN(rof)) {
+      enhanced._enhancedRof = rof * (1 + (bonuses.rateOfFire || 0) * mult);
+    }
+  }
+
+  // Броня: увеличиваем Пулестойкость на долю от maxbonus (исправлено с "maksbonus")
+  if (currentType === 'armor') {
+    const maxBonus = Number(enhanced.maxbonus) || 0; // <-- ВАЖНО: maxbonus
+    const m = /Пулестойкость:\s*([+\-]?\d+(?:[.,]\d+)?)/i.exec(enhanced.xaract || '');
+    if (m) {
+      const base = parseFloat(m[1].replace(',', '.')) || 0;
+      const val  = base + maxBonus * mult;
+      enhanced._enhancedArmorValue = val;
+      // Обновим строку для читабельности (оставим целое значение)
+      enhanced.xaract = enhanced.xaract.replace(
+        /Пулестойкость:\s*([+\-]?\d+(?:[.,]\d+)?)/i,
+        `Пулестойкость: ${Math.round(val)}`
+      );
+    }
+  }
 
   return enhanced;
 }
@@ -1083,78 +1258,125 @@ function getComparableValue(value) {
 
 function compareItems() {
   if (!selectedItems.selector1 || !selectedItems.selector2 || !resultContainer) return;
-  
+
   resultContainer.innerHTML = '';
 
-  // применяем заточку
-  const w1 = applyEnhancement(selectedItems.selector1, 'selector1');
-  const w2 = applyEnhancement(selectedItems.selector2, 'selector2');
+  // Заголовок
+  const headerRow = document.createElement('div');
+  headerRow.className = 'comparison-row';
+  headerRow.innerHTML = `
+    <div class="comparison-header">Характеристика</div>
+    <div class="comparison-value">${selectedItems.selector1.name}</div>
+    <div class="comparison-value">${selectedItems.selector2.name}</div>
+  `;
+  resultContainer.appendChild(headerRow);
 
-  // функция для модификации xaract, не ломая остальные параметры
-  function getEnhancedXaract(w, origXaract) {
-  if (!w._enhancedDamage && !w._enhancedRof) return origXaract;
-  const lines = origXaract.split('\n').map(l => l.trim());
+  // ===== ВЕТКИ ПО ТИПУ =====
+  if (currentType === 'weapon') {
+    const w1 = applyEnhancement(selectedItems.selector1, 'selector1');
+    const w2 = applyEnhancement(selectedItems.selector2, 'selector2');
 
-  return lines.map(line => {
-    if (line.startsWith("Урон")) {
-      const dmg = w._enhancedDamage || extractDamageStats(origXaract);
-      const close = dmg.closeDamage.toFixed(1);
-      const far   = dmg.farDamage.toFixed(1);
-      const start = dmg.startDistance ? dmg.startDistance.toFixed(1) : null;
-      const max   = dmg.maxDistance   ? dmg.maxDistance.toFixed(1)   : null;
+    // обновляем только строки Урон/Скорострельность, остальные — как есть
+    const patchX = (w, orig) => {
+      if (!w._enhancedDamage && !w._enhancedRof) return orig;
+      return orig.split('\n').map(line => {
+        if (line.startsWith('Урон') && w._enhancedDamage) {
+          const d = w._enhancedDamage;
+          const start = d.startDistance ? `${d.startDistance.toFixed(1)}м - ` : '';
+          const max   = d.maxDistance   ? `${d.maxDistance.toFixed(1)}м`   : '';
+          return `Урон: ${d.closeDamage.toFixed(1)} | ${start}${d.farDamage.toFixed(1)} | ${max}`;
+        }
+        if (line.startsWith('Скорострельность') && w._enhancedRof) {
+          return `Скорострельность: ${w._enhancedRof.toFixed(1)} выстрелов/мин`;
+        }
+        return line;
+      }).join('\n');
+    };
 
-      const startPart = start ? `${start}м - ` : '';
-      const maxPart   = max   ? `${max}м`      : '';
+    const s1 = { ...parseStats(patchX(w1, w1.xaract)), ...parseStats(w1.blueStat) };
+    const s2 = { ...parseStats(patchX(w2, w2.xaract)), ...parseStats(w2.blueStat) };
 
-      return `Урон: ${close} | ${startPart}${far} | ${maxPart}`;
-    }
-    if (line.startsWith("Скорострельность") && w._enhancedRof) {
-      return `Скорострельность: ${w._enhancedRof.toFixed(1)} выстрелов/мин`;
-    }
-    return line;
-  }).join('\n');
-}
+    renderStatsTable(s1, s2);
+  }
 
-  const w1Xaract = getEnhancedXaract(w1, w1.xaract);
-  const w2Xaract = getEnhancedXaract(w2, w2.xaract);
+  else if (currentType === 'armor') {
+    const a1 = applyEnhancement(selectedItems.selector1, 'selector1');
+    const a2 = applyEnhancement(selectedItems.selector2, 'selector2');
 
-  const s1 = { 
-    ...parseStats(w1Xaract), 
-    ...parseStats(w1.blueStat) 
-  };
-  const s2 = { 
-    ...parseStats(w2Xaract), 
-    ...parseStats(w2.blueStat) 
-  };
+    // Сначала Пулестойкость (улучшенная), затем прочие строки
+    const getArmorVal = a => {
+      if (typeof a._enhancedArmorValue === 'number') return a._enhancedArmorValue;
+      const m = /Пулестойкость:\s*([+\-]?\d+(?:[.,]\d+)?)/i.exec(a.xaract || '');
+      return m ? parseFloat(m[1].replace(',', '.')) : 0;
+    };
 
-  const allKeys = [...new Set([...Object.keys(s1), ...Object.keys(s2)])];
-  
-  allKeys.forEach(key => {
-    const v1 = getComparableValue(s1[key]);
-    const v2 = getComparableValue(s2[key]);
-    let class1 = 'equal', class2 = 'equal';
-    
-    if (v1 !== null && v2 !== null) {
-      const isInverted = invertedStats.has(key);
-      
-      if ((!isInverted && v1 > v2) || (isInverted && v1 < v2)) {
-        class1 = 'better';
-        class2 = 'worse';
-      } else if ((!isInverted && v1 < v2) || (isInverted && v1 > v2)) {
-        class1 = 'worse';
-        class2 = 'better';
+    addRow('Пулестойкость', getArmorVal(a1).toFixed(0), getArmorVal(a2).toFixed(0));
+
+    // Остальные строки, кроме повторной «Пулестойкости»
+    const s1 = parseStats(a1.xaract + (a1.blueStat ? `\n${a1.blueStat}` : ''));
+    const s2 = parseStats(a2.xaract + (a2.blueStat ? `\n${a2.blueStat}` : ''));
+    delete s1['Пулестойкость'];
+    delete s2['Пулестойкость'];
+
+    renderStatsTable(s1, s2);
+  }
+
+  else if (currentType === 'artifacts') {
+    const p1El = document.getElementById('selector1-percent');
+    const p2El = document.getElementById('selector2-percent');
+    const p1 = p1El ? (parseInt(p1El.value, 10) || 0) : 0;
+    const p2 = p2El ? (parseInt(p2El.value, 10) || 0) : 0;
+
+    const m1 = buildArtifactScaledMap(selectedItems.selector1, p1);
+    const m2 = buildArtifactScaledMap(selectedItems.selector2, p2);
+
+    const allKeys = new Set([...Object.keys(m1), ...Object.keys(m2)]);
+
+    allKeys.forEach((k) => {
+      const s1 = m1[k] ? (m1[k].value === 0 ? "-" : formatNumberWithUnit(m1[k].value, m1[k].unit)) : "-";
+      const s2 = m2[k] ? (m2[k].value === 0 ? "-" : formatNumberWithUnit(m2[k].value, m2[k].unit)) : "-";
+
+      // Пропускаем строку, если значения для обоих артефактов равны 0
+      if (m1[k]?.value === 0 && m2[k]?.value === 0) {
+        return;
       }
-    }
-    
+
+      addRow(k, s1, s2);
+    });
+  }
+
+  comparisonResult?.classList.remove('hidden');
+
+  // ===== РЕНДЕР СТРОК И ФУНКЦИИ-ПОМОЩНИКИ =====
+  function addRow(stat, val1, val2) {
     const row = document.createElement('div');
     row.className = 'comparison-row';
+
+    const n1 = getComparableValue(val1);
+    const n2 = getComparableValue(val2);
+    let class1 = 'equal', class2 = 'equal';
+
+    // инвертированные метрики уже объявлены выше в файле
+    const isInverted = invertedStats?.has(stat);
+
+    if (n1 !== null && n2 !== null) {
+      if ((!isInverted && n1 > n2) || (isInverted && n1 < n2)) {
+        class1 = 'better'; class2 = 'worse';
+      } else if ((!isInverted && n1 < n2) || (isInverted && n1 > n2)) {
+        class1 = 'worse'; class2 = 'better';
+      }
+    }
+
     row.innerHTML = `
-      <div class="comparison-header">${key}</div>
-      <div class="comparison-value ${class1}">${s1[key] || '-'}</div>
-      <div class="comparison-value ${class2}">${s2[key] || '-'}</div>
+      <div class="comparison-header">${stat}</div>
+      <div class="comparison-value ${class1}">${val1 ?? '-'}</div>
+      <div class="comparison-value ${class2}">${val2 ?? '-'}</div>
     `;
     resultContainer.appendChild(row);
-  });
-  
-  comparisonResult?.classList.remove('hidden');
+  }
+
+  function renderStatsTable(s1, s2) {
+    const keys = [...new Set([...Object.keys(s1 || {}), ...Object.keys(s2 || {})])];
+    keys.forEach(k => addRow(k, s1[k], s2[k]));
+  }
 }

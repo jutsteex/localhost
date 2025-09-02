@@ -609,10 +609,20 @@ pointer-events: none;
     padding: 8px 12px;
     border-radius: 7px;
     font-family: 'Manrope', sans-serif;
-    width: 80px;
     text-align: center;
     margin-left: 10px;
     transition: all 0.3s ease;
+}
+
+/* Для input */
+input.ap-input {
+    width: 80px;
+}
+
+/* Для select */
+select.ap-input {
+    min-width: 140px;
+    text-align: left;
 }
 
 .ap-input:focus {
@@ -624,6 +634,12 @@ pointer-events: none;
 .ap-input::placeholder {
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.85rem;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 

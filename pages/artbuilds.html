@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СБОРКИ АРТЕФАКТОВ | STALCUBE.WIKI</title>
+    <link rel="stylesheet" href="../css/style1.css">
+    <link rel="stylesheet" href="../css/raduga.css">
+    <link rel="icon" href="../image/site.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body>
+    <!-- Остальное содержимое без изменений -->
+     <nav>
+    <div class="navbar">
+        <a href="../index.html" class="logo">
+            <span>STALCUBE.WIKI</span>
+        </a>
+        
+        <!-- Кнопка мобильного меню -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="../index.html">Главная</a></li>
+            <li><a href="https://stalcube.su/">Сайт игры</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Разделы <i class="fas fa-chevron-down"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="./index1.html"><i class="fas fa-chevron-right"></i> Артефакты</a></li>
+                    <li><a href="./index2.html"><i class="fas fa-chevron-right"></i> Броня и костюмы</a></li>
+                    <li><a href="./index3.html"><i class="fas fa-chevron-right"></i> Оружие</a></li>
+                    <li><a href="./faq.html"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                    <li><a href="./news.html"><i class="fas fa-chevron-right"></i> Статьи и гайды</a></li>
+                    <li><a href="./artbuilds.html"><i class="fas fa-chevron-right"></i> Сборки артефактов</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Инструменты <i class="fas fa-chevron-down"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="https://cubecalc.ru/"><i class="fas fa-chevron-right"></i> Калькулятор сборок</a></li>
+                    <li><a href="https://cubemaps.ru/"><i class="fas fa-chevron-right"></i> Интерактивная карта</a></li>
+                    <li><a href="./srav.html"><i class="fas fa-chevron-right"></i> Сравнение предметов</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Затемнение фона для мобильного меню -->
+    <div class="nav-overlay" id="navOverlay"></div>
+</nav>
+
+    <div class="artifacts-container">
+        <h1 class="artifacts-title">АРТЕФАКТЫ</h1>
+
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">Все</div>
+            <div class="category-tab" data-category="bio">Живучесть</div>
+            <div class="category-tab" data-category="electro">Комбинированная</div>
+            <div class="category-tab" data-category="grav">Скорость</div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Поиск по названию...">
+        </div>
+
+    </div>
+
+
+    <!-- Современный футер -->
+    <footer class="modern-footer">
+        <div class="footer-content">
+            <div class="footer-main">
+                <div class="footer-logo">STALCUBE.WIKI</div>
+                <p class="footer-description">Руководство по игре STALCUBE. Здесь вы найдете всю необходимую информацию об игре, артефактах, оружии и тактиках выживания.</p>
+            </div>
+            
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <h3>Навигация</h3>
+                    <ul class="footer-links">
+                        <li><a href="./index.html"><i class="fas fa-chevron-right"></i> Главная</a></li>
+                        <li><a href="./pages/news.html"><i class="fas fa-chevron-right"></i> Статьи</a></li>
+                        <li><a href="./pages/srav.html"><i class="fas fa-chevron-right"></i> Сравнение предметов</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Ресурсы</h3>
+                    <ul class="footer-links">
+                        <li><a href="https://stalcube.su/"><i class="fas fa-chevron-right"></i> Официальный сайт</a></li>
+                        <li><a href="https://cubecalc.ru/"><i class="fas fa-chevron-right"></i> Калькулятор сборок</a></li>
+                        <li><a href="https://cubemaps.ru/"><i class="fas fa-chevron-right"></i> Интерактивная карта</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Поддержка</h3>
+                    <ul class="footer-links">
+                        <li><a href="https://vk.com/stalcube.official?from=search"><i class="fas fa-chevron-right"></i> Сообщить о проблеме</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-social">
+                <a href="https://vk.com/stalcube.official?from=search" class="social-icon"><i class="fab fa-vk"></i></a>
+                <a href="https://discord.gg/stalcube" class="social-icon"><i class="fab fa-discord"></i></a>
+                <a href="https://www.youtube.com/@stalcube_game" class="social-icon"><i class="fab fa-youtube"></i></a>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 STALCUBE WIKI.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="../js/afrifacts.js"></script>
+   <script src="../js/MainMenuForSmart.js"></script>
+</body>
+
+</html>
