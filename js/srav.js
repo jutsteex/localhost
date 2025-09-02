@@ -1355,8 +1355,7 @@ function compareItems() {
     const n1 = getComparableValue(val1);
     const n2 = getComparableValue(val2);
     let class1 = 'equal', class2 = 'equal';
-
-    // инвертированные метрики уже объявлены выше в файле
+    
     const isInverted = invertedStats?.has(stat);
 
     if (n1 !== null && n2 !== null) {

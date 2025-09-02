@@ -756,7 +756,7 @@ nav {
   width: auto;
   height: auto;
   max-width: 95vw;   /* ✅ отключаем сжатие */
-  max-height: 120vh;  /* ✅ отключаем сжатие */
+  max-height: 150vh;  /* ✅ отключаем сжатие */
   display: block;
   margin: auto;
 }
