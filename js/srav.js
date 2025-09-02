@@ -450,8 +450,8 @@ function calcWeaponAtDistance(weapon, distance, bulletResist, targetHP, hitType 
   const shotsToKill = effHP / damage;
   const timeToKill = shotsToKill * (60 / rof);
 
-  // DPS теперь зависит от AP (через TTK)
-  const dps = targetHP / timeToKill;
+  
+  const dps = targetHP / damage;
 
   return {
     dps,
