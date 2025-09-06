@@ -592,18 +592,19 @@ function applyEnhancement(item, selectorId) {
     }
   }
 
-  // Броня: увеличиваем Пулестойкость на долю от maxbonus (исправлено с "maksbonus")
+  // Броня: увеличиваем Пулестойкость на долю от maxbonus
   if (currentType === 'armor') {
-    const maxBonus = Number(enhanced.maxbonus) || 0; // <-- ВАЖНО: maxbonus
+    const maxBonus = Number(enhanced.maxbonus) || 0;
     const m = /Пулестойкость:\s*([+\-]?\d+(?:[.,]\d+)?)/i.exec(enhanced.xaract || '');
     if (m) {
       const base = parseFloat(m[1].replace(',', '.')) || 0;
       const val  = base + maxBonus * mult;
       enhanced._enhancedArmorValue = val;
-      // Обновим строку для читабельности (оставим целое значение)
+
+      // Обновим строку: округление до 1 знака после запятой
       enhanced.xaract = enhanced.xaract.replace(
         /Пулестойкость:\s*([+\-]?\d+(?:[.,]\d+)?)/i,
-        `Пулестойкость: ${Math.round(val)}`
+        `Пулестойкость: ${val.toFixed(1)}`
       );
     }
   }
@@ -1310,26 +1311,27 @@ function compareItems() {
   }
 
   else if (currentType === 'armor') {
-    const a1 = applyEnhancement(selectedItems.selector1, 'selector1');
-    const a2 = applyEnhancement(selectedItems.selector2, 'selector2');
+  const a1 = applyEnhancement(selectedItems.selector1, 'selector1');
+  const a2 = applyEnhancement(selectedItems.selector2, 'selector2');
 
-    // Сначала Пулестойкость (улучшенная), затем прочие строки
-    const getArmorVal = a => {
-      if (typeof a._enhancedArmorValue === 'number') return a._enhancedArmorValue;
-      const m = /Пулестойкость:\s*([+\-]?\d+(?:[.,]\d+)?)/i.exec(a.xaract || '');
-      return m ? parseFloat(m[1].replace(',', '.')) : 0;
-    };
+  // Сначала Пулестойкость (улучшенная), затем прочие строки
+  const getArmorVal = a => {
+    if (typeof a._enhancedArmorValue === 'number') return a._enhancedArmorValue;
+    const m = /Пулестойкость:\s*([+\-]?\d+(?:[.,]\d+)?)/i.exec(a.xaract || '');
+    return m ? parseFloat(m[1].replace(',', '.')) : 0;
+  };
 
-    addRow('Пулестойкость', getArmorVal(a1).toFixed(0), getArmorVal(a2).toFixed(0));
+  // теперь выводим с одним знаком после запятой
+  addRow('Пулестойкость', getArmorVal(a1).toFixed(1), getArmorVal(a2).toFixed(1));
 
-    // Остальные строки, кроме повторной «Пулестойкости»
-    const s1 = parseStats(a1.xaract + (a1.blueStat ? `\n${a1.blueStat}` : ''));
-    const s2 = parseStats(a2.xaract + (a2.blueStat ? `\n${a2.blueStat}` : ''));
-    delete s1['Пулестойкость'];
-    delete s2['Пулестойкость'];
+  // Остальные строки, кроме повторной «Пулестойкости»
+  const s1 = parseStats(a1.xaract + (a1.blueStat ? `\n${a1.blueStat}` : ''));
+  const s2 = parseStats(a2.xaract + (a2.blueStat ? `\n${a2.blueStat}` : ''));
+  delete s1['Пулестойкость'];
+  delete s2['Пулестойкость'];
 
-    renderStatsTable(s1, s2);
-  }
+  renderStatsTable(s1, s2);
+}
 
   else if (currentType === 'artifacts') {
     const p1El = document.getElementById('selector1-percent');
