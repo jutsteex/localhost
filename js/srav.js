@@ -459,6 +459,7 @@ function formatNumberWithUnit(val, unit) {
   return (val < 0 ? '-' : sign) + numStr + (unit ? unit : '');
 }
 
+  // округление до 3 знаков мосле запятой у урона оружия
 function formatDamageValue(val) {
   return parseFloat(val.toFixed(3)).toString().replace('.', ',');
 }
