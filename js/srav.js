@@ -459,6 +459,10 @@ function formatNumberWithUnit(val, unit) {
   return (val < 0 ? '-' : sign) + numStr + (unit ? unit : '');
 }
 
+function formatDamageValue(val) {
+  return parseFloat(val.toFixed(3)).toString().replace('.', ',');
+}
+
 // Возвращает { ключ: {min, max, unit} } — если нет диапазона, min==max
 function parseArtifactStatsRange(xaract) {
   const res = {};
@@ -782,8 +786,8 @@ function calculateMetrics(weapon, bulletResist, targetHP, selectorId) {
     farHeadshotTTK: farHS.ttk.toFixed(3),
 
     armorPiercing: (close.ap * 100).toFixed(1) + '%',
-    closeDamage: close.damage.toFixed(1),
-    farDamage: far.damage.toFixed(1),
+    closeDamage: formatDamageValue(close.damage),
+    farDamage: formatDamageValue(far.damage),
     maxDistance: farDist,
     rateOfFire: close.rof.toFixed(1),
     damageDrop: ((1 - far.damage / close.damage) * 100).toFixed(1) + '%',
@@ -1295,7 +1299,7 @@ function compareItems() {
           const d = w._enhancedDamage;
           const start = d.startDistance ? `${d.startDistance.toFixed(1)}м - ` : '';
           const max   = d.maxDistance   ? `${d.maxDistance.toFixed(1)}м`   : '';
-          return `Урон: ${d.closeDamage.toFixed(1)} | ${start}${d.farDamage.toFixed(1)} | ${max}`;
+          return `Урон: ${formatDamageValue(d.closeDamage)} | ${start}${formatDamageValue(d.farDamage)} | ${max}`;
         }
         if (line.startsWith('Скорострельность') && w._enhancedRof) {
           return `Скорострельность: ${w._enhancedRof.toFixed(1)} выстрелов/мин`;
