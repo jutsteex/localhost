@@ -436,10 +436,14 @@ function calculateDamageAtDistance(weapon, distance, selectorId) {
 }
 function parseNumberWithUnit(s) {
   if (!s) return { num: 0, unit: '' };
-  const m = s.replace(/\s+/g,'').match(/([+\-]?\d+(?:[.,]\d+)?)(.*)$/);
+
+  // аккуратно парсим: число + всё остальное (включая %, кг и т.д.)
+  const m = s.trim().match(/([+\-]?\d+(?:[.,]\d+)?)(.*)$/);
   if (!m) return { num: 0, unit: '' };
+
   const num = parseFloat(m[1].replace(',', '.'));
-  const unit = (m[2] || '').trim();
+  const unit = (m[2] || '').trim(); // <-- сохраняем ровно так, как в JSON (с % или без)
+
   return { num: isFinite(num) ? num : 0, unit };
 }
 
@@ -447,9 +451,12 @@ function formatNumberWithUnit(val, unit) {
   if (Math.abs(val) < 1e-3) {
     return '0' + (unit || '');
   }
+
   const sign = val > 0 ? '+' : '';
   const numStr = Math.abs(val).toFixed(2).replace('.', ',');
-  return (val < 0 ? '-' : sign) + numStr + (unit || '');
+
+  // всегда добавляем unit так, как он пришёл из JSON (%, кг и т.п.)
+  return (val < 0 ? '-' : sign) + numStr + (unit ? unit : '');
 }
 
 // Возвращает { ключ: {min, max, unit} } — если нет диапазона, min==max
@@ -469,7 +476,10 @@ function parseArtifactStatsRange(xaract) {
       const [a, b] = val.split('<->').map(s => s.trim());
       const A = parseNumberWithUnit(a);
       const B = parseNumberWithUnit(b);
-      const unit = B.unit || A.unit || '';
+
+      // Берём unit из того, где он явно указан
+      const unit = (A.unit && A.unit.length > 0) ? A.unit : (B.unit || '');
+
       res[key] = { min: A.num, max: B.num, unit };
     } else {
       const A = parseNumberWithUnit(val);
