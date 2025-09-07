@@ -344,6 +344,7 @@
     {
       "name": "ППЗ-71",
       "image": "../image/Weapon/ppz.png",
+      "video": "../image/Weapon/ппз.mp4",
       "categories": [
         "pp"
       ],
