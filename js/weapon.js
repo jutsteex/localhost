@@ -174,8 +174,8 @@ function initEventHandlers() {
             if (modalVideo.src !== direct) modalVideo.src = direct;
 
             // анимированно расширяем от левого-верхнего угла до 240x120
-            modalVideo.style.width = '640px';
-            modalVideo.style.height = '360px';
+            modalVideo.style.width = '788px';
+            modalVideo.style.height = '478px';
             modalVideo.style.opacity = '1';
             try { modalVideo.currentTime = 0; } catch (e) {}
             const p = modalVideo.play();
