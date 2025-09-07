@@ -194,17 +194,11 @@ function initEventHandlers() {
     // Открытие модального окна при клике на карточку
     document.querySelectorAll('.weapon-card').forEach(card => {
         card.addEventListener('click', function() {
-            const img = this.dataset.image || '';
-            const name = this.dataset.name || '';
-            const desc = this.dataset.description || '';
-
-            if (modalImage) {
-                modalImage.src = img;
-                modalImage.alt = name;
-                modalImage.dataset.video = this.dataset.video || ''; // важно — передаём ссылку в модальное изображение
-            }
-            if (modalTitle) modalTitle.textContent = name;
-            if (modalDesc) modalDesc.textContent = desc;
+            modalImage.src = this.dataset.image;
+            modalImage.alt = this.dataset.name;
+            modalImage.dataset.video = this.dataset.video || '';
+            modalTitle.textContent = this.dataset.name;
+            modalDesc.textContent = this.dataset.description;
 
             const propertiesHTML = `
               <div class="property-item">
@@ -223,45 +217,28 @@ function initEventHandlers() {
               </div>
               <div class="property-item">
                   <div class="property-title">Характеристики:</div>
-                  <div class="property-value">${(this.dataset.xaract || '').split('\\n').map(line =>
-                `<div>${line}</div>`
-            ).join('')}</div>
+                  <div class="property-value">${(this.dataset.xaract || '').split('\n').join('<br>')}</div>
               </div>
               ${this.dataset.blueStat ? `
               <div class="property-item">
                   <div class="property-title">Дополнительно:</div>
-                  <div class="property-value">${(this.dataset.blueStat || '').split('\\n').map(line =>
-                `<div>${line}</div>`
-            ).join('')}</div>
+                  <div class="property-value">${(this.dataset.blueStat || '').split('\n').join('<br>')}</div>
               </div>` : ''}
           `;
 
-            if (modalProperties) modalProperties.innerHTML = propertiesHTML;
-
-            // сбрасываем старое видео, если было
-            if (modalVideo) {
-                modalVideo.pause();
-                modalVideo.src = '';
-                modalVideo.style.opacity = '0';
-                modalVideo.style.width = '0px';
-                modalVideo.style.height = '0px';
-            }
-
-            if (modal) modal.style.display = 'block';
+            modalProperties.innerHTML = propertiesHTML;
+            modal.style.display = 'block';
         });
     });
 
-    // Закрытие модального окна при клике вне области — и остановка видео
     window.addEventListener('click', function(event) {
-        if (modal && event.target === modal) {
+        if (event.target === modal) {
             modal.style.display = 'none';
-            if (modalVideo) {
-                modalVideo.pause();
-                modalVideo.src = '';
-                modalVideo.style.opacity = '0';
-                modalVideo.style.width = '0px';
-                modalVideo.style.height = '0px';
-            }
+            modalVideo.pause();
+            modalVideo.style.opacity = '0';
+            modalVideo.style.width = '0px';
+            modalVideo.style.height = '0px';
+            modalVideo.src = '';
         }
     });
 }
