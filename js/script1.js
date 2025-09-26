@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const dots = document.querySelectorAll('.carousel-dot');
     const prevBtn = document.querySelector('.carousel-control.prev');
     const nextBtn = document.querySelector('.carousel-control.next');
+    
     let currentSlide = 0;
     let slideInterval;
+    
     
     // Функция перехода к слайду
     function goToSlide(index) {
@@ -63,6 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.querySelector('.hero-carousel');
     carousel.addEventListener('mouseenter', () => clearInterval(slideInterval));
     carousel.addEventListener('mouseleave', startInterval);
+
+    
     
     // Выпадающие меню для мобильных устройств
     const dropdownToggles = document.querySelectorAll('.dropdown-toggle');

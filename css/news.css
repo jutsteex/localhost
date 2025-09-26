@@ -71,7 +71,7 @@
     background: rgba(255, 241, 155, 0.9);
     color: #000000;
     border-color: #FFF19B;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -81,11 +81,10 @@
     border-color: #FFF19B;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(255, 241, 155, 0.3);
-    font-weight: 700;
 }
 
 .filter-btn:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

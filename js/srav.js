@@ -297,14 +297,17 @@ function selectItem(item) {
     ? (Array.isArray(ammoData) ? ammoData.filter(a => a.type === item.ammoType) : [])
     : [];
 
-  // заточка — для оружия и брони
+  // заточка — для оружия и брони (кнопки +/- и поле ввода, плюс скрытый input для логики)
   const enhanceHTML = (currentType === 'weapon' || currentType === 'armor')
     ? `
       <div class="enhancement">
         <label for="${selectorId}-enhance">Заточка:</label>
-        <select id="${selectorId}-enhance" class="ap-input">
-          ${Array.from({ length: 16 }, (_, i) => `<option value="${i}">+${i}</option>`).join('')}
-        </select>
+        <div class="enhance-controls" style="display:flex;align-items:center;gap:8px;">
+          <button type="button" class="enhance-btn" id="${selectorId}-enhance-minus">−</button>
+          <input type="number" min="0" max="15" value="0" id="${selectorId}-enhance-input" class="enhance-input" />
+          <button type="button" class="enhance-btn" id="${selectorId}-enhance-plus">+</button>
+          <input type="hidden" id="${selectorId}-enhance" value="0" />
+        </div>
       </div>
     ` : '';
 
@@ -330,21 +333,66 @@ function selectItem(item) {
 
   preview.classList.remove('hidden');
   preview.innerHTML = `
-    <img src="${item.image}" alt="${item.name}">
-    <h4>${item.name}</h4>
+    <img class="item-image" src="${item.image}" alt="${item.name}">
+    <h4 class="item-title">${item.name}</h4>
     <div class="artifact-category">${item.categories?.[0] || ''}</div>
-    ${enhanceHTML}
-    ${ammoHTML}
-    ${percentHTML}
+    <div class="controls">
+      ${enhanceHTML}
+      ${ammoHTML}
+      ${percentHTML}
+    </div>
   `;
 
-  // обработчики заточки
-  const enhanceSelect = document.getElementById(`${selectorId}-enhance`);
-  if (enhanceSelect) {
-    enhanceSelect.addEventListener('change', () => {
-      if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
+  // обработчики заточки (кнопки +/- меняют скрытый инпут)
+  const enhanceInput = document.getElementById(`${selectorId}-enhance`);
+  const enhanceVisible = document.getElementById(`${selectorId}-enhance-input`);
+  const minusBtn = document.getElementById(`${selectorId}-enhance-minus`);
+  const plusBtn = document.getElementById(`${selectorId}-enhance-plus`);
+  const updateDisabled = () => {
+    const v = parseInt(enhanceInput?.value || '0', 10) || 0;
+    if (minusBtn) minusBtn.disabled = v <= 0;
+    if (plusBtn) plusBtn.disabled = v >= 15;
+  };
+  const notifyChange = () => {
+    if (enhanceVisible && enhanceInput) enhanceVisible.value = String(enhanceInput.value);
+    updateDisabled();
+    if (selectedItems.selector1 && selectedItems.selector2) updateDetailedChart();
+  };
+  const clampLevel = (v) => Math.max(0, Math.min(15, v));
+  if (minusBtn && enhanceInput) {
+    minusBtn.addEventListener('click', () => {
+      const v = clampLevel((parseInt(enhanceInput.value, 10) || 0) - 1);
+      enhanceInput.value = String(v);
+      notifyChange();
     });
   }
+  if (plusBtn && enhanceInput) {
+    plusBtn.addEventListener('click', () => {
+      const v = clampLevel((parseInt(enhanceInput.value, 10) || 0) + 1);
+      enhanceInput.value = String(v);
+      notifyChange();
+    });
+  }
+  // Ввод вручную значения заточки (0..15)
+  if (enhanceVisible && enhanceInput) {
+    enhanceVisible.addEventListener('input', () => {
+      let v = parseInt(enhanceVisible.value, 10);
+      if (isNaN(v)) v = 0;
+      v = clampLevel(v);
+      enhanceInput.value = String(v);
+      notifyChange();
+    });
+    enhanceVisible.addEventListener('blur', () => {
+      let v = parseInt(enhanceVisible.value, 10);
+      if (isNaN(v)) v = 0;
+      v = clampLevel(v);
+      enhanceVisible.value = String(v);
+      enhanceInput.value = String(v);
+      notifyChange();
+    });
+  }
+  // начальная инициализация состояния
+  notifyChange();
 
   // обработчики патронов
   const ammoSelect = document.getElementById(`${selectorId}-ammo`);

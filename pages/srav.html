@@ -53,6 +53,125 @@
       border-radius: 8px;
     }
 
+    /* === Переработанная карточка выбора с улучшенной композицией === */
+    .selector-box {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(47,43,40,0.95) 0%, rgba(30,28,26,0.98) 100%);
+      border: 2px solid rgba(255,241,155,0.4);
+      border-radius: 12px;
+      box-shadow: 
+        0 8px 32px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,241,155,0.1);
+      transition: all 0.3s ease;
+    }
+    .selector-box:hover {
+      border-color: rgba(255,241,155,0.6);
+      box-shadow: 
+        0 12px 40px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,241,155,0.2);
+    }
+    
+    .artifact-preview {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    /* Изображение предмета */
+    .artifact-preview .item-image { 
+      width: 140px; 
+      height: 140px; 
+      object-fit: contain; 
+      filter: drop-shadow(0 4px 20px rgba(255,241,155,0.15));
+      margin: 0 auto;
+      transition: transform 0.3s ease;
+    }
+    .artifact-preview .item-image:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Заголовок и категория */
+    .artifact-preview .item-title { 
+      color: #fff; 
+      text-align: center; 
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .artifact-preview .artifact-category { 
+      color: rgba(255,241,155,0.8); 
+      font-size: 0.9rem; 
+      text-align: center;
+      font-weight: 500;
+      margin: -8px 0 8px 0;
+    }
+    
+    /* Блок настроек */
+    .artifact-preview .controls { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 14px; 
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    /* Строки настроек */
+    .artifact-preview .enhancement { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      gap: 12px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      border: 1px solid rgba(255,241,155,0.2);
+    }
+    .artifact-preview .enhancement label {
+      color: #FFF19B;
+      font-weight: 600;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+    .artifact-preview .enhance-controls { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px;
+    }
+    .artifact-preview .enhance-level { 
+      flex: 0 0 auto;
+      min-width: 50px;
+    }
+    
+    /* Селектор патронов */
+    .artifact-preview .enhancement select.ap-input { 
+      width: 100%; 
+      max-width: 200px;
+    }
+
+    /* Кнопка выбора */
+    .selector-box .select-btn { 
+      margin-top: 8px;
+      padding: 12px 24px;
+      font-weight: 600;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #FFF19B 0%, #e6d98a 100%);
+      color: #2F2B28;
+      border: none;
+      box-shadow: 0 4px 12px rgba(255,241,155,0.3);
+      transition: all 0.3s ease;
+    }
+    .selector-box .select-btn:hover {
+      background: linear-gradient(135deg, #e6d98a 0%, #FFF19B 100%);
+      box-shadow: 0 6px 16px rgba(255,241,155,0.4);
+      transform: translateY(-2px);
+    }
+
     .chart-buttons {
       display: flex;
       justify-content: center;
@@ -186,6 +305,41 @@
       height: 16px;
       border-radius: 50%;
       border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* === Заточка: красивые кнопки +/- в стиле сайта === */
+    .enhancement { margin-top: 10px; }
+    .enhancement label { color:#FFF19B; font-weight:600; margin-right: 8px; }
+    .enhance-controls { gap: 8px; }
+    .enhance-btn {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 241, 155, 0.3);
+      border-radius: 6px;
+      background: rgba(47, 43, 40, 0.85);
+      color: #FFF19B;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      line-height: 1;
+      user-select: none;
+    }
+    .enhance-btn:hover { background: rgba(255, 241, 155, 0.12); border-color: #FFF19B; }
+    .enhance-btn:active { transform: translateY(1px); }
+    .enhance-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+    .enhance-controls { background: rgba(47,43,40,0.55); padding: 2px; border-radius: 6px; border: 1px solid rgba(255,241,155,0.15); }
+    .enhance-input {
+      width: 64px;
+      height: 34px;
+      text-align: center;
+      color: #FFF19B;
+      background: rgba(47, 43, 40, 0.7);
+      border: 1px solid rgba(255, 241, 155, 0.3);
+      border-radius: 6px;
+      font-weight: 700;
     }
 
     /* Стили для скролла */

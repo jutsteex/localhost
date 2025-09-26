@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Википедия STALCUBE</title>
-    <link rel="stylesheet" href="./css/styleforindex.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Оружие | STALCUBE.WIKI</title>
+    <link rel="stylesheet" href="../css/style1.css">
     <link rel="icon" href="../image/site.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-    <nav>
+     <nav>
     <div class="navbar">
         <a href="../index.html" class="logo">
             <span>STALCUBE.WIKI</span>
@@ -24,24 +25,24 @@
         </button>
 
         <ul class="nav-links" id="navLinks">
-            <li><a href="./index.html">Главная</a></li>
+            <li><a href="../index.html">Главная</a></li>
             <li><a href="https://stalcube.su/">Сайт игры</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle">Разделы <i class="fas fa-chevron-down"></i></a>
                 <ul class="dropdown-menu">
-                    <li><a href="./pages/index1.html">Артефакты</a></li>
-                    <li><a href="./pages/index2.html">Броня и костюмы</a></li>
-                    <li><a href="./pages/index3.html">Оружие</a></li>
-                    <li><a href="./pages/faq.html">FAQ</a></li>
-                    <li><a href="./pages/news.html">Статьи и гайды</a></li>
+                    <li><a href="./index1.html"> Артефакты</a></li>
+                    <li><a href="./index2.html"> Броня и костюмы</a></li>
+                    <li><a href="./index3.html"> Оружие</a></li>
+                    <li><a href="./faq.html"> FAQ</a></li>
+                    <li><a href="./news.html"> Статьи и гайды</a></li>
                 </ul>
             </li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle">Инструменты <i class="fas fa-chevron-down"></i></a>
                 <ul class="dropdown-menu">
-                    <li><a href="https://cubecalc.ru/">Калькулятор сборок</a></li>
-                    <li><a href="https://cubemaps.ru/">Интерактивная карта</a></li>
-                    <li><a href="./pages/srav.html">Сравнение предметов</a></li>
+                    <li><a href="https://cubecalc.ru/"> Калькулятор сборок</a></li>
+                    <li><a href="https://cubemaps.ru/"> Интерактивная карта</a></li>
+                    <li><a href="./srav.html"> Сравнение предметов</a></li>
                 </ul>
             </li>
         </ul>
@@ -51,55 +52,49 @@
     <div class="nav-overlay" id="navOverlay"></div>
 </nav>
 
-    <!-- Карусель -->
-    <section class="hero-carousel">
-        <div class="carousel-slides">
-            <div class="carousel-slide">
-                <div class="carousel-content">
-                    <h2>Интерактивная карта</h2>
-                    <p>Полная карта всех локаций с отметками артефактов, мутантов и важных точек</p>
-                    <a href="https://cubemaps.ru/" class="btn primary">Исследовать карты</a>
-                </div>
+    <div class="weapon-container">
+        <h1 class="weapon-title">Оружие</h1>
+
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">Все</div>
+            <div class="category-tab" data-category="sniper">Снайперские винтовки</div>
+            <div class="category-tab" data-category="assault">Штурмовые винтовки</div>
+            <div class="category-tab" data-category="pistols">Пистолеты</div>
+            <div class="category-tab" data-category="droboviki">Дробовики</div>
+            <div class="category-tab" data-category="pulemety">Пулеметы</div>
+            <div class="category-tab" data-category="pp">Пистолеты-пулеметы</div>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Поиск по названию...">
+        </div>
+
+        <div class="weapon-grid-container">
+            <div class="weapon-grid" id="weaponGrid">
             </div>
-            <div class="carousel-slide">
-                <div class="carousel-content">
-                    <h2>Калькулятор сборок</h2>
-                    <p>Создавайте оптимальные сборки оружия и рассчитывайте их характеристики</p>
-                    <a href="https://cubecalc.ru/" class="btn primary">Создать сборку</a>
+        </div>
+    </div>
+
+    <!-- Остальные карточки... -->
+    </div>
+    </div>
+    </div>
+
+    <div id="weaponModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalWeaponTitle" class="modal-title"></h2>
+            <div class="modal-content-inner">
+                <div class="modal-left">
+                    <img id="modalWeaponImage" src="" alt="" class="weapon-image">
+                    <p id="modalWeaponDescription" class="modal-description"></p>
                 </div>
-            </div>
-            <div class="carousel-slide">
-                <div class="carousel-content">
-                    <h2>Сравнение предметов</h2>
-                    <p>Сравните характеристики оружия, скинов и агентов. Найдите лучшие варианты для вашего стиля игры</p>
-                    <a href="./pages/srav.html" class="btn primary">Сравнить предметы</a>
+                <div class="modal-right">
+                    <h3 class="property-title" style="text-align: center; margin-bottom: 20px;">Характеристики</h3>
+                    <div id="modalWeaponProperties" class="weapon-properties"></div>
                 </div>
             </div>
         </div>
-        <div class="carousel-nav">
-            <div class="carousel-dot active"></div>
-            <div class="carousel-dot"></div>
-            <div class="carousel-dot"></div>
-        </div>
-        <button class="carousel-control prev"><i class="fas fa-chevron-left"></i></button>
-        <button class="carousel-control next"><i class="fas fa-chevron-right"></i></button>
-    </section>
-
-    <!-- Основное содержимое -->
-    <main class="main-content">
-        <section class="features-section">
-            <div class="section-header">
-                <h2>Последние статьи и гайды</h2>
-                <p>Выберите интересующие вас статьи...</p>
-            </div>
-
-            <div class="promo-grid" id="mainCardsGrid"></div>
-        </section>
-    </main>
-    <!-- Модалка для карточек главной -->
-             <div id="modalOverlay" class="modal-overlay">
-                <div id="modalContainer" class="modal-container"></div>
-            </div>
+    </div>
 
     <!-- Современный футер -->
     <footer class="modern-footer">
@@ -140,7 +135,6 @@
                 <a href="https://vk.com/stalcube.official?from=search" class="social-icon"><i class="fab fa-vk"></i></a>
                 <a href="https://discord.gg/stalcube" class="social-icon"><i class="fab fa-discord"></i></a>
                 <a href="https://www.youtube.com/@stalcube_game" class="social-icon"><i class="fab fa-youtube"></i></a>
-                <a href="https://t.me/stalcubechat" class="social-icon"><i class="fab fa-telegram"></i></a>
             </div>
             
             <div class="footer-bottom">
@@ -148,10 +142,8 @@
             </div>
         </div>
     </footer>
-
-    <script src="./js/mainCards.js"></script>
-
-    <script src="./js/script1.js"></script>
-    <script src="./js/MainMenuForSmart.js"></script>
+    <script src="../js/weapon.js"></script>
+ <script src="../js/MainMenuForSmart.js"></script>
 </body>
+
 </html>
